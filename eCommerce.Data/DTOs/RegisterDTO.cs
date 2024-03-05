@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eCommerce.Data.Models
+namespace eCommerce.Data.DTOs
 {
     public class RegisterDTO
     {

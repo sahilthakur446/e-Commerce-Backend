@@ -1,5 +1,6 @@
 ﻿using eCommerce.Data.Data;
-using eCommerce.Data.Models;
+using eCommerce.Data.DTOs;
+using eCommerce.Data.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,62 +10,55 @@ namespace e_Commerce.API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly IAccountRepository accountRepo;
 
-        public UsersController(ApplicationDbContext _context)
+        public UsersController(IAccountRepository _accountRepo)
         {
-            context = _context;
+            accountRepo = _accountRepo;
         }
         [HttpPost("Login")]
-        public IActionResult Login() 
+        public async Task<IActionResult> Login([FromBody] LoginDTO user) 
         {
-            return Ok();
+            if (!await accountRepo.CheckIfEmailExistsAsync(user))
+            {
+                return BadRequest("No email found");
+            }
+            if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password) )
+            {
+                return BadRequest("Invalid Input");
+            }
+
+            if (await accountRepo.Login(user))
+            {
+                return Ok(new {JWTtoken = accountRepo.JWTToken });
+            }
+            return BadRequest("Wrong Password");
         }
+
         [HttpPost("Register")]
-        public IActionResult Register([FromBody] RegisterDTO user)
+        public async Task<IActionResult> Register([FromBody] RegisterDTO user)
         {
-            var ifUserAlreadyExist = context.Users.FirstOrDefault(u => u.Email == user.Email);
-            var ifUserTableEmpty = !context.Users.Any();
-            var ifUserRolesTableEmpty = !context.UserRoles.Any();
-            bool doesPasswordMatch = user.Password == user.ConfirmPassword;
-            if (ifUserRolesTableEmpty)
+            if (await accountRepo.CheckIfEmailExistsAsync(user))
             {
-                var adminRole = new UserRole 
-                {
-                    RoleName = "Admin"
-                };
-                var normalUserRole = new UserRole
-                {
-                    RoleName = "NormalUser"
-                };
-                context.UserRoles.Add(adminRole);
-                context.UserRoles.Add(normalUserRole);
-                context.SaveChanges();
+                return BadRequest("Already User Exist with Same email");
             }
-            if (ifUserAlreadyExist == null && doesPasswordMatch)
+            if (user.Password != user.ConfirmPassword)
             {
-                int userRoleId;
-                if (ifUserTableEmpty)
-                {
-                    userRoleId = context.UserRoles.FirstOrDefault(role => role.RoleName == "Admin").RoleId;
-                }
-                else
-                {
-                    userRoleId = context.UserRoles.FirstOrDefault(role => role.RoleName == "NormalUser").RoleId;
-                }
-                var newUser = new User
-                {
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    Password = user.Password,
-                    UserRoleId = userRoleId
-                };
-                context.Users.Add(newUser);
-                context.SaveChanges();
-                return Ok();
+                return BadRequest("Password and Confirm Password are not same");
             }
-            return BadRequest();
+            if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password) 
+                || string.IsNullOrEmpty(user.ConfirmPassword) || string.IsNullOrEmpty(user.FirstName)
+                || string.IsNullOrEmpty(user.LastName))
+            {
+                return BadRequest("Invalid Input");
+            }
+
+            if (await accountRepo.Register(user))
+            {
+                return CreatedAtAction("Register",user);
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+
         }
     }
 }
