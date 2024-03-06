@@ -8,22 +8,32 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace eCommerce.Data.Models
-{
-    public class User
     {
+    public enum Gender
+        {
+        Male,
+        Female,
+        Unisex
+        }
+
+    public class User
+        {
         [Key]
         public int UserId { get; set; }
 
-        [Required] 
+        [Required]
         public string FirstName { get; set; }
 
-        [Required] 
+        [Required]
         public string LastName { get; set; }
+
+        [EnumDataType(typeof(Gender))]
+        public Gender Gender { get; set; }
 
         [Required]
         public string Email { get; set; }
 
-        [Required] 
+        [Required]
         public string Password { get; set; }
 
         [NotMapped]
@@ -32,6 +42,5 @@ namespace eCommerce.Data.Models
         [ForeignKey("UserRole")]
         public int UserRoleId { get; set; }
         public UserRole UserRole { get; set; }
+        }
     }
-}
-

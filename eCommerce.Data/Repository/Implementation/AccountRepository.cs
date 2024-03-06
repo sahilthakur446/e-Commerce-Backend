@@ -31,7 +31,7 @@ namespace eCommerce.Data.Repository.Implementation
         {
             if (user != null)
             {
-                if (await IfEmailExistAsync(user))
+                if (await CheckIfEmailExistsAsync(user))
                 {
                     var loggigInUser = await context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
                     if (loggigInUser != null && VerifyPassword(user.Password, loggigInUser.Password))
