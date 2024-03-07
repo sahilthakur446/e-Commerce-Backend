@@ -12,8 +12,7 @@ namespace eCommerce.Data.Models
     public enum Gender
         {
         Male,
-        Female,
-        Unisex
+        Female
         }
 
     public class User

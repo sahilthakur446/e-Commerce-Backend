@@ -16,9 +16,15 @@ namespace eCommerce.Data.Models
         public class Product
             {
             public Product()
-            {
+                {
                 this.Reviews = new List<Review>();
-            }
+                }
+            public enum Gender
+                {
+                Male,
+                Female,
+                Unisex
+                }
 
             [Key]
             public int ProductId { get; set; }
@@ -26,9 +32,8 @@ namespace eCommerce.Data.Models
             [Required]
             public string ProductName { get; set; }
             public string ProductDescription { get; set; }
-
-            public string Gender { get; set; }
-            public string ProductType { get; set; }
+            [EnumDataType(typeof(Gender))]
+            public Gender TargetGender { get; set; }
 
             [Required]
             public int Price { get; set; }
@@ -46,7 +51,7 @@ namespace eCommerce.Data.Models
 
             public bool IsNew { get; set; }
 
-            public DateTime DateAdded { get; set; }
+            public DateTime DateAdded { get; set; } = DateTime.Now;
             public int TimesBought { get; set; }
 
             public virtual ICollection<Review> Reviews { get; set; }

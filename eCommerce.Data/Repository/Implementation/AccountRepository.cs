@@ -78,9 +78,9 @@ namespace eCommerce.Data.Repository.Implementation
                 using var hmac = new HMACSHA512();
                 var newUser = new User
                 {
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
+                    FirstName = user.FirstName.ToLower(),
+                    LastName = user.LastName.ToLower(),
+                    Email = user.Email.ToLower(),
                     Password = HashingPassword(user.Password),
                     UserRoleId = userRoleId
                 };
