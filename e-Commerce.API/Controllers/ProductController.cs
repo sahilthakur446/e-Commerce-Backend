@@ -1,4 +1,6 @@
-﻿using eCommerce.Data.Repository.Interface;
+﻿using eCommerce.Data.DTOs;
+using eCommerce.Data.Models;
+using eCommerce.Data.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,9 +28,26 @@ namespace e_Commerce.API.Controllers
             return NotFound();
         }
 
-        [HttpGet("GetProductswithSpecificBrand")]
+
+        [HttpPost("AddProduct")]
+        public async Task<IActionResult> AddProduct(ProductDTO product)
+            {
+            var result = await productRepository.AddProduct(product);
+            if (result)
+                {
+                return CreatedAtAction("AddProduct",product);
+                }
+            return BadRequest();
+            }
+
+        [HttpPost("GetProductswithSpecificBrand")]
         public async Task<IActionResult> GetProductswithSpecificBrand(string brandName)
             {
+            if (string.IsNullOrEmpty(brandName))
+                {
+                return BadRequest("Invalid Input");
+                }
+
             var products = await productRepository.GetProductwithSpecificBrand(brandName);
             if (products.Any())
                 {

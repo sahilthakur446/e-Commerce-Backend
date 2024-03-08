@@ -1,4 +1,4 @@
-﻿using eCommerce.Data.Models.eCommerce.Data.Models;
+﻿using eCommerce.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

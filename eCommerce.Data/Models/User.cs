@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace eCommerce.Data.Models
     {
-    public enum Gender
+    public enum UserGender
         {
         Male,
         Female
@@ -26,8 +26,8 @@ namespace eCommerce.Data.Models
         [Required]
         public string LastName { get; set; }
 
-        [EnumDataType(typeof(Gender))]
-        public Gender Gender { get; set; }
+        [EnumDataType(typeof(UserGender))]
+        public UserGender Gender { get; set; }
 
         [Required]
         public string Email { get; set; }

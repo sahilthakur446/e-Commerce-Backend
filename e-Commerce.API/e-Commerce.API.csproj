@@ -24,4 +24,8 @@
     <ProjectReference Include="..\eCommerce.Data\eCommerce.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>
