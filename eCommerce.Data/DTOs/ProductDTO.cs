@@ -1,5 +1,6 @@
 ﻿using eCommerce.Data.Models;
 using Microsoft.AspNetCore.Http;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,18 +14,19 @@ namespace eCommerce.Data.DTOs
         [Key]
         public int ProductId { get; set; }
 
-        [Required]
-        public string ProductName { get; set; }
-        public string ProductDescription { get; set; }
-        public GenderApplicability TargetGender { get; set; }
+        public string? ProductName { get; set; }
+        
+        public string? ProductDescription { get; set; }
+        public int? TargetGender { get; set; }
 
-        [Required]
-        public int Price { get; set; }
-        public int StockQuantity { get; set; }
-        public IFormFile Image { get; set; }
+        public int? Price { get; set; }
+        public int? StockQuantity { get; set; }
+        [SwaggerParameter(Required = false)]
+        public IFormFile? Image { get; set; }
+        
         public string? ImagePath { get; set; }
-        public int CategoryId { get; set; }
-        public int BrandId { get; set; }
-        public string BrandName { get; set; }
+        public int? CategoryId { get; set; }
+        public int? BrandId { get; set; }
+        public string? BrandName { get; set; }
         }
     }

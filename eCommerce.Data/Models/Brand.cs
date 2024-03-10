@@ -18,6 +18,6 @@ namespace eCommerce.Data.Models
         public int BrandId { get; set; }
         [Required]
         public string BrandName { get; set; }
-        public virtual ICollection<Product> Products { get; set; }
+        public virtual List<Product> Products { get; set; }
         }
     }

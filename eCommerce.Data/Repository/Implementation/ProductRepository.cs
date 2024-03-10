@@ -3,31 +3,67 @@ using eCommerce.Data.DTOs;
 using eCommerce.Data.Models;
 using eCommerce.Data.Repository.Interface;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-
+using static eCommerce.Data.Models.Product;
 
 namespace eCommerce.Data.Repository.Implementation
-    {
+{
     public class ProductRepository : IProductRepository
-        {
-        private readonly ApplicationDbContext context;
-        private readonly IWebHostEnvironment webHostEnvironment;
+    {
+        private readonly ApplicationDbContext _dbContext;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public ProductRepository(ApplicationDbContext _context, IWebHostEnvironment _webHostEnvironment)
+        public ProductRepository(ApplicationDbContext dbContext, IWebHostEnvironment hostingEnvironment)
         {
-            context = _context;
-            webHostEnvironment = _webHostEnvironment;
-            }
+            _dbContext = dbContext;
+            _hostingEnvironment = hostingEnvironment;
+        }
 
         public async Task<List<ProductDTO>> GetAllProductsAsync()
+        {
+            try
             {
-            var productList = await context.Products.Include(p => p.Brand).ToListAsync();
-            var productsDTOList = new List<ProductDTO>();
+                var products = await _dbContext.Products.Include(product => product.Brand).ToListAsync();
+                var productDtos = new List<ProductDTO>();
 
-            foreach (var product in productList) 
+                foreach (var product in products)
                 {
-                var productDTO = new ProductDTO
+                    var productDto = ProductToProductDTOMapper(product);
+                    if (!(productDto is null))
                     {
+                        productDtos.Add(productDto);
+                    }
+
+                }
+                return productDtos;
+            }
+            catch (Exception error)
+            {
+                throw error;
+            }
+        }
+
+        public async Task<ProductDTO> GetProduct(int id)
+        {
+            var product = await _dbContext.Products.Include(p => p.Brand).FirstOrDefaultAsync(p => p.ProductId == id);
+            if (product != null)
+            {
+                var productDto = ProductToProductDTOMapper(product);
+                if (!(productDto is null))
+                {
+                    return productDto;
+                }
+            }
+            return null;
+        }
+
+        private ProductDTO ProductToProductDTOMapper(Product product)
+        {
+            if (!(product is null))
+            {
+                var productDto = new ProductDTO
+                {
                     ProductId = product.ProductId,
                     ProductName = product.ProductName,
                     ProductDescription = product.ProductDescription,
@@ -37,92 +73,140 @@ namespace eCommerce.Data.Repository.Implementation
                     CategoryId = product.CategoryId,
                     BrandId = product.BrandId,
                     BrandName = product.Brand.BrandName
-                    };
-                productsDTOList.Add(productDTO);
+                };
+                return productDto;
+            }
+            return null;
+        }
+
+        private async Task<string> SaveImageAsync(int? categoryId, IFormFile imageFile)
+        {
+            var category = await _dbContext.Categories.FindAsync(categoryId);
+            string categoryName = category.CategoryName;
+
+            if (!string.IsNullOrEmpty(categoryName))
+            {
+                string imagesFolderPath = Path.Combine(_hostingEnvironment.WebRootPath, "images", categoryName.ToLower());
+                if (!Directory.Exists(imagesFolderPath))
+                {
+                    Directory.CreateDirectory(imagesFolderPath);
                 }
-            return productsDTOList;
+
+                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                string fullImagePath = Path.Combine(imagesFolderPath, uniqueFileName);
+
+                using (var fileStream = new FileStream(fullImagePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(fileStream);
+                }
+
+                return Path.Combine("images", categoryName.ToLower(), uniqueFileName);
             }
 
-        public async Task<bool> AddProduct(ProductDTO product) 
+            return string.Empty;
+        }
+
+        private bool DeleteImage(string imagePath)
+        {
+            string imageFullPath = Path.Combine(_hostingEnvironment.WebRootPath, imagePath);
+            if (File.Exists(imageFullPath))
             {
-            var categoryEntity = await context.Categories.FindAsync(product.CategoryId);
-            string CategoryName = categoryEntity.CategoryName;
-
-            string imageFolderPath;
-            string imagePath;
-
-            if (product != null)
-            {
-                if (CategoryName.ToLower() == "tshirt" )
-                    {
-                    imagePath = Path.Combine("images", "tshirt");
-                    imageFolderPath = Path.Combine(webHostEnvironment.WebRootPath, "images", "tshirts");
-
-                    }
-                else if (CategoryName.ToLower() == "jacket")
-                    {
-                    imagePath = Path.Combine("images", "jacket");
-                    imageFolderPath = webHostEnvironment.WebRootPath + "images" + "jacket";
-
-                    }
-                else if (CategoryName.ToLower() == "dress")
-                    {
-                    imagePath = Path.Combine("images", "dress");
-                    imageFolderPath = Path.Combine(webHostEnvironment.WebRootPath,"images","dress");
-                    }
-                else
-                    {
-                    return false;
-                    }
-                if (!Directory.Exists(imageFolderPath))
-                {
-                    Directory.CreateDirectory(imageFolderPath);
-                }
-                string uniqueName = Guid.NewGuid().ToString();
-                string imageName = uniqueName + Path.GetExtension(product.Image.FileName);
-                string imageFullPath = Path.Combine(imageFolderPath, imageName);
-                imagePath = Path.Combine(imagePath, imageName);
-
-                using (var filestream = new FileStream(imageFullPath, FileMode.Create))
-
-                    { await product.Image.CopyToAsync(filestream); }
-
-                var newProduct = new Product
-                    {
-                    ProductName = product.ProductName,
-                    ProductDescription = product.ProductDescription,
-                    TargetGender = product.TargetGender,
-                    Price = product.Price,
-                    StockQuantity = product.StockQuantity,
-                    ImagePath = imagePath,
-                    CategoryId = product.CategoryId,
-                    BrandId = product.BrandId,
-                    DateAdded = DateTime.Now,
-                    TimesBought = 1
-                    };
-                await context.AddAsync(newProduct);
-                await context.SaveChangesAsync();
-
+                File.Delete(imageFullPath);
                 return true;
-
             }
             return false;
         }
 
-        public async Task<List<Brand>> GetProductwithSpecificBrand(string brandName)
+        public async Task<bool> AddProductAsync(ProductDTO productDto)
+        {
+            if (!(productDto is null))
             {
-            int brandId;
-            var productList = await context.Brands.Include(p => p.Products).Where(x => x.BrandName.ToLower() == brandName.ToLower()).ToListAsync();
-            var brand = await context.Brands.FirstOrDefaultAsync(b => b.BrandName == brandName);
-            if (brand != null)
+                var product = new Product
                 {
-                brandId = brand.BrandId;
-                /*await context.Products.Include(p => p.Brand).Where(p => p.BrandId == brandId).ToListAsync()*/
-                return  (productList);  
-                }
-            return null;
-            
+                    ProductName = productDto.ProductName,
+                    ProductDescription = productDto.ProductDescription,
+                    TargetGender = (GenderApplicability)productDto.TargetGender,
+                    Price = (int)productDto.Price,
+                    StockQuantity = (int)productDto.StockQuantity,
+                    ImagePath = await SaveImageAsync(productDto.CategoryId, productDto.Image),
+                    CategoryId =(int) productDto.CategoryId,
+                    BrandId = (int)productDto.BrandId,
+                    DateAdded = DateTime.Now,
+                    TimesBought = 0
+                };
+
+                await _dbContext.Products.AddAsync(product);
+                await _dbContext.SaveChangesAsync();
+
+                return true;
             }
 
+            return false;
+        }
+
+        public async Task<bool> UpdateProductAsync(int id, ProductDTO productDTO)
+        {
+            string updateImagePath;
+            string oldImagePath = null;
+            if (!(productDTO is null))
+            {
+                var product = await _dbContext.Products.FindAsync(id);
+                if (!(product is null))
+                {
+                    if (!(productDTO.Image is null))
+                    {
+                        oldImagePath = product.ImagePath;
+                        updateImagePath = await SaveImageAsync(productDTO.CategoryId, productDTO.Image);
+                        product.ImagePath = updateImagePath;
+                            if (!string.IsNullOrEmpty(oldImagePath))
+                            {
+                                if (!DeleteImage(oldImagePath))
+                                {
+                                throw new Exception("Unable to Delete Image");
+                                }
+                                return true;
+                            }
+                            
+                    }
+
+
+                    product.ProductName = productDTO.ProductName ?? product.ProductName;
+                    product.ProductDescription = productDTO.ProductDescription ?? product.ProductDescription;
+                    product.Price = productDTO.Price ?? product.Price;
+                    product.StockQuantity = productDTO.StockQuantity ?? product.StockQuantity;
+                    product.CategoryId = productDTO.CategoryId ?? product.CategoryId;
+                    product.BrandId = productDTO.BrandId ?? product.BrandId;
+                    var changes = await _dbContext.SaveChangesAsync();
+                 
+
+                }
+                return false;
+            }
+            return false;
+
+        }
+
+
+        public async Task<bool> DeleteProductAsync(int? id)
+        {
+            if (!(id is null))
+            {
+                var product = await _dbContext.Products.FindAsync(id);
+                if (!(product is null))
+                {
+                    if (DeleteImage(product.ImagePath))
+                    {
+                        _dbContext.Products.Remove(product);
+                        await _dbContext.SaveChangesAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
         }
     }
+}
