@@ -17,7 +17,7 @@ namespace e_Commerce.API.Controllers
             accountRepo = _accountRepo;
         }
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] LoginDTO user) 
+        public async Task<IActionResult> Login([FromForm] LoginDTO user) 
         {
             if (!await accountRepo.CheckIfEmailExistsAsync(user))
             {
@@ -36,7 +36,7 @@ namespace e_Commerce.API.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDTO user)
+        public async Task<IActionResult> Register([FromForm] RegisterDTO user)
         {
             if (await accountRepo.CheckIfEmailExistsAsync(user))
             {
