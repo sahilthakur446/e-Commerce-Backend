@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eCommerce.Utilities.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,12 +10,6 @@ using System.Threading.Tasks;
 
 namespace eCommerce.Data.Models
     {
-    public enum UserGender
-        {
-        Male,
-        Female
-        }
-
     public class User
         {
         [Key]

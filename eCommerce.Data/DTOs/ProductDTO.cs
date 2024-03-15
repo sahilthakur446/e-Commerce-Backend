@@ -17,7 +17,7 @@ namespace eCommerce.Data.DTOs
         public string? ProductName { get; set; }
         
         public string? ProductDescription { get; set; }
-        public int? TargetGender { get; set; }
+        public string? TargetGender { get; set; }
 
         public int? Price { get; set; }
         public int? StockQuantity { get; set; }

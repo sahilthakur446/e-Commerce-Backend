@@ -11,8 +11,9 @@ namespace eCommerce.Data.Repository.Interface
     {
         Task<List<CategorySummaryDTO>> GetCategorySummaryListAsync();
         Task<List<CategoryDTO>> GetCategoryDetailsListAsync();
+        Task<List<ProductDTO>> GetCategoryProductsListAsync(int categoryId);
         Task<bool> AddCategoryAsync(AddCategoryDTO categoryDTO);
-        Task<bool> UpdateCategoryAsync(AddCategoryDTO categoryDTO);
+        Task<bool> UpdateCategoryAsync(int id, UpdateCategoryDTO categoryDTO);
         Task<bool> DeleteCategoryAsync(int? categoryId);
     }
 }

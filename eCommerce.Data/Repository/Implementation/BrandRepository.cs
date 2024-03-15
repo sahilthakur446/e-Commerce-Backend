@@ -20,7 +20,7 @@ namespace eCommerce.Data.Repository.Implementation
             _dbContext = dbContext;
         }
 
-        public async Task<BrandDTO> GetBrand(int? BrandId) 
+        public async Task<BrandDTO> GetBrandByIdAsync(int? BrandId) 
         {
             var brand = await _dbContext.Brands.FindAsync(BrandId);
             if (brand is null)
@@ -35,7 +35,7 @@ namespace eCommerce.Data.Repository.Implementation
             return brandDTO;
         }
 
-        public async Task<BrandDTO> GetBrandWithProducts(int? BrandId)
+        public async Task<BrandDTO> GetBrandWithProductsAsync(int? BrandId)
         {
             var brand = await _dbContext.Brands.Include(brand => brand.Products).FirstOrDefaultAsync(brand => brand.BrandId == BrandId);
             if (brand is null)
@@ -68,7 +68,7 @@ namespace eCommerce.Data.Repository.Implementation
             return null;
         }
 
-        public async Task<List<BrandDTO>> GetBrandDetailsListAsync()
+        public async Task<List<BrandDTO>> GetAllBrandsWithProductsAsync()
         {
             var Brands = await _dbContext.Brands.Include(c => c.Products).ToListAsync();
             List<BrandDTO> brandDetails = new List<BrandDTO>();

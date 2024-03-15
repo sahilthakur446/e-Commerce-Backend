@@ -1,65 +1,76 @@
 ﻿using eCommerce.Data.Data;
 using eCommerce.Data.DTOs;
 using eCommerce.Data.Models;
-using static eCommerce.Data.Models.Category;
 using eCommerce.Data.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using eCommerce.Utilities.Enums;
+using static eCommerce.Utilities.GenderConverter;
+
 
 namespace eCommerce.Data.Repository.Implementation
 {
     public class CategoryRepository : ICategoryRepository
-    {
+        {
         private readonly ApplicationDbContext _dbContext;
 
         public CategoryRepository(ApplicationDbContext dbContext)
-        {
+            {
             _dbContext = dbContext;
-        }
+            }
 
         public async Task<List<CategorySummaryDTO>> GetCategorySummaryListAsync()
-        {
+            {
             var categories = await _dbContext.Categories.ToListAsync();
             if (categories != null)
-            {
+                {
                 var categorySummaries = categories
                     .Select(c => new CategorySummaryDTO { CategoryId = c.CategoryId, CategoryName = c.CategoryName })
                     .ToList();
                 if (!categorySummaries.Any())
-                {
+                    {
                     throw new Exception("No categories found.");
-                }
+                    }
                 return categorySummaries;
-            }
+                }
             return null;
-        }
+            }
 
         public async Task<List<CategoryDTO>> GetCategoryDetailsListAsync()
-        {
+            {
             var categories = await _dbContext.Categories.Include(c => c.products).ToListAsync();
             List<CategoryDTO> categoryDetails = new List<CategoryDTO>();
+
             if (categories.Any())
-            {
-                foreach (var category in categories)
                 {
-                    var categoryDetail = new CategoryDTO
+                foreach (var category in categories)
                     {
+                    var categoryDetail = new CategoryDTO
+                        {
                         CategoryId = category.CategoryId,
                         CategoryName = category.CategoryName,
-                        TargetGender = (int)category.CategoryTargetGender,
+                        TargetGender = GetTargetGenderString(category.CategoryTargetGender),
                         productDTOs = MapProductsToProductDTOs(category.products)
-                    };
+                        };
                     categoryDetails.Add(categoryDetail);
-                }
+                    }
                 return categoryDetails;
-            }
+                }
             return null;
+            }
+
+        public async Task<List<ProductDTO>> GetCategoryProductsListAsync(int categoryId)
+            {
+            var productList = new List<ProductDTO>();
+            var category = await _dbContext.Categories.Include(category => category.products).FirstOrDefaultAsync(c => c.CategoryId == categoryId);
+            if (category is null)
+            {
+                return null;
+            }
+            productList = MapProductsToProductDTOs(category.products);
+            return productList;
         }
+           
 
         public async Task<bool> AddCategoryAsync(AddCategoryDTO categoryDTO)
         {
@@ -70,22 +81,22 @@ namespace eCommerce.Data.Repository.Implementation
             var category = new Category
             {
                 CategoryName = categoryDTO.CategoryName,
-                CategoryTargetGender = (TargetGender)categoryDTO.TargetGender
+                CategoryTargetGender = GetTargetGender(categoryDTO.TargetGender)
             };
             await _dbContext.Categories.AddAsync(category);
             await _dbContext.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> UpdateCategoryAsync(AddCategoryDTO categoryDTO)
+        public async Task<bool> UpdateCategoryAsync(int id, UpdateCategoryDTO categoryDTO)
         {
-           var category = await _dbContext.Categories.FindAsync(categoryDTO.CategoryId);
+           var category = await _dbContext.Categories.FindAsync(id);
             if (category is null)
             {
                 return false;
             }
-            _dbContext.Entry(category).CurrentValues.SetValues(categoryDTO);
-            category.CategoryTargetGender = (TargetGender)categoryDTO.TargetGender;
+            category.CategoryName = categoryDTO.CategoryName ?? category.CategoryName;
+            category.CategoryTargetGender = categoryDTO.TargetGender is not null ? GetTargetGender(categoryDTO.TargetGender): category.CategoryTargetGender;
             var changes = await _dbContext.SaveChangesAsync();
             if (changes > 0)
             {

@@ -10,10 +10,10 @@ namespace eCommerce.Data.Repository.Interface
 {
     public interface IBrandRepository
     {
-        Task<BrandDTO> GetBrand(int? BrandId);
-        Task<BrandDTO> GetBrandWithProducts(int? BrandId);
+        Task<BrandDTO> GetBrandByIdAsync(int? BrandId);
+        Task<BrandDTO> GetBrandWithProductsAsync(int? BrandId);
         Task<List<BrandSummaryDTO>> GetBrandSummaryListAsync();
-        Task<List<BrandDTO>> GetBrandDetailsListAsync();
+        Task<List<BrandDTO>> GetAllBrandsWithProductsAsync();
         Task<bool> AddBrandAsync(AddBrandDTO BrandDTO);
         Task<bool> UpdateBrandAsync(AddBrandDTO BrandDTO);
         Task<bool> DeleteBrandAsync(int? BrandId);

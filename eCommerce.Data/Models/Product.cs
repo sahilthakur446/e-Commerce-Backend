@@ -1,27 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Http;
+using eCommerce.Utilities.Enums;
 
 namespace eCommerce.Data.Models
-    {
+{
     public class Product
         {
         public Product()
             {
             this.Reviews = new List<Review>();
             }
-        public enum GenderApplicability
-            {
-            Male,
-            Female,
-            Unisex
-            }
-
         [Key]
         public int ProductId { get; set; }
 

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static eCommerce.Data.Models.Category;
+﻿using System.ComponentModel.DataAnnotations;
+using eCommerce.Utilities.Enums;
 
 namespace eCommerce.Data.Models
 {
@@ -14,21 +9,13 @@ namespace eCommerce.Data.Models
         {
             this.products = new List<Product>();
         }
-
-        public enum TargetGender
-        {
-            Male,
-            Female,
-            Unisex
-        }
-
         
         [Key]
         public int CategoryId { get; set; }
 
         public string CategoryName { get; set; }
-        [EnumDataType(typeof(TargetGender))]
-        public TargetGender CategoryTargetGender { get; set; }
+        [EnumDataType(typeof(GenderApplicability))]
+        public GenderApplicability? CategoryTargetGender { get; set; }
         public List<Product> products { get; set; }
     }
 }

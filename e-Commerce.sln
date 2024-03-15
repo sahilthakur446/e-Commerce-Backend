@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "e-Commerce.API", "e-Commerce.API\e-Commerce.API.csproj", "{C1A59314-EBE8-471F-B438-54EA99C7A9C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "e-Commerce.API", "e-Commerce.API\e-Commerce.API.csproj", "{C1A59314-EBE8-471F-B438-54EA99C7A9C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eCommerce.Data", "eCommerce.Data\eCommerce.Data.csproj", "{4F419A75-1BE0-4442-A9AE-44A1E1318606}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eCommerce.Data", "eCommerce.Data\eCommerce.Data.csproj", "{4F419A75-1BE0-4442-A9AE-44A1E1318606}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eCommerce.Utilities", "ClassLibrary1\eCommerce.Utilities.csproj", "{3AA7246D-A023-4A76-81A4-D69A9E03D462}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{4F419A75-1BE0-4442-A9AE-44A1E1318606}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F419A75-1BE0-4442-A9AE-44A1E1318606}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F419A75-1BE0-4442-A9AE-44A1E1318606}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AA7246D-A023-4A76-81A4-D69A9E03D462}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AA7246D-A023-4A76-81A4-D69A9E03D462}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AA7246D-A023-4A76-81A4-D69A9E03D462}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AA7246D-A023-4A76-81A4-D69A9E03D462}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

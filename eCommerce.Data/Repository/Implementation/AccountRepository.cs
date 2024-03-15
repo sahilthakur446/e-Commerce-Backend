@@ -5,13 +5,12 @@ using eCommerce.Data.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using static eCommerce.Utilities.GenderConverter;
+using eCommerce.Utilities.Enums;
 
 
 namespace eCommerce.Data.Repository.Implementation
@@ -80,7 +79,7 @@ namespace eCommerce.Data.Repository.Implementation
                     {
                     FirstName = user.FirstName.ToLower(),
                     LastName = user.LastName.ToLower(),
-                    Gender = (UserGender) user.Gender,
+                    Gender = GetUserGender(user.Gender),
                     Email = user.Email.ToLower(),
                     Password = HashingPassword(user.Password),
                     UserRoleId = userRoleId

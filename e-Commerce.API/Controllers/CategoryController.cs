@@ -42,6 +42,18 @@ namespace e_Commerce.API.Controllers
             return NotFound();
         }
 
+        [HttpGet]
+        [Route("GetCategoryProductList/{categoryId}")]
+        public async Task<IActionResult> GetCategoryProductList(int categoryId)
+            {
+            var productList = await _categoryRepository.GetCategoryProductsListAsync(categoryId);
+            if (productList is not null)
+                {
+                return Ok(productList);
+                }
+            return NotFound();
+            }
+
         [HttpPost]
         [Route("AddCategory")]
         public async Task<IActionResult> AddCategory([FromForm] AddCategoryDTO categoryDTO)
@@ -59,14 +71,14 @@ namespace e_Commerce.API.Controllers
         }
 
         [HttpPut]
-        [Route("UpdateCategory")]
-        public async Task<IActionResult> UpdateCategory([FromForm] AddCategoryDTO categoryDTO)
+        [Route("UpdateCategory/{id}")]
+        public async Task<IActionResult> UpdateCategory(int id, [FromForm] UpdateCategoryDTO categoryDTO)
         {
             if (categoryDTO is null)
             {
                 return BadRequest("Invalid Input");
             }
-            bool result = await _categoryRepository.UpdateCategoryAsync(categoryDTO);
+            bool result = await _categoryRepository.UpdateCategoryAsync(id,categoryDTO);
             if (result)
             {
                 return Ok();

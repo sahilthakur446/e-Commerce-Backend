@@ -12,8 +12,8 @@ using eCommerce.Data.Data;
 namespace eCommerce.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240308051205_init22")]
-    partial class init22
+    [Migration("20240315082648_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -208,7 +208,7 @@ namespace eCommerce.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("eCommerce.Data.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -251,6 +251,11 @@ namespace eCommerce.Data.Migrations
             modelBuilder.Entity("eCommerce.Data.Models.Brand", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("eCommerce.Data.Models.Category", b =>
+                {
+                    b.Navigation("products");
                 });
 
             modelBuilder.Entity("eCommerce.Data.Models.Product", b =>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,16 +11,25 @@ namespace eCommerce.Data.DTOs
     {
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; }
-        public int? TargetGender { get; set; }
+        public string? TargetGender { get; set; }
         public List<ProductDTO>? productDTOs { get; set; }
     }
 
     public class AddCategoryDTO
     {
-        public int? CategoryId { get; set; }
+        public int CategoryId { get; set; }
+        [Required]
         public string CategoryName { get; set; }
-        public int TargetGender { get; set; }
+        [Required]
+        public string TargetGender { get; set; }
     }
+
+    public class UpdateCategoryDTO
+        {
+        public string? CategoryName { get; set; }
+        public string? TargetGender { get; set; }
+        }
+
     public class CategorySummaryDTO
     {
         public int CategoryId { get; set; }

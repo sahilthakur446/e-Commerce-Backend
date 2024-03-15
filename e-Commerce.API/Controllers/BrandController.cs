@@ -22,7 +22,7 @@ namespace e_Commerce.API.Controllers
         [Route("GetBrand/{brandId}")]
         public async Task<IActionResult> GetBrand(int? brandId)
         {
-            var brand = await _brandRepository.GetBrand(brandId);
+            var brand = await _brandRepository.GetBrandByIdAsync(brandId);
             if (brand is not null)
             {
                 return Ok(brand);
@@ -34,7 +34,7 @@ namespace e_Commerce.API.Controllers
         [Route("GetBrandWithProducts/{brandId}")]
         public async Task<IActionResult> GetBrandWithProducts(int? brandId)
         {
-            var brand = await _brandRepository.GetBrandWithProducts(brandId);
+            var brand = await _brandRepository.GetBrandWithProductsAsync(brandId);
             if (brand is not null)
             {
                 return Ok(brand);
@@ -55,10 +55,10 @@ namespace e_Commerce.API.Controllers
         }
 
         [HttpGet]
-        [Route("GetBrandDetailsList")]
+        [Route("GetAllBrandsWithProducts")]
         public async Task<IActionResult> GetBrandDetailsList()
         {
-            var brandList = await _brandRepository.GetBrandDetailsListAsync();
+            var brandList = await _brandRepository.GetAllBrandsWithProductsAsync();
             if (brandList is not null)
             {
                 return Ok(brandList);

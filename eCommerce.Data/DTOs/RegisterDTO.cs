@@ -16,7 +16,7 @@ namespace eCommerce.Data.DTOs
         [Required]
         public string LastName { get; set; }
         [Required]
-        public int Gender { get; set; }
+        public string Gender { get; set; }
         [Required]
         public string Email { get; set; }
         [Required]
