@@ -36,6 +36,32 @@ namespace eCommerce.Data.Repository.Implementation
             return null;
             }
 
+        public async Task<List<CategoryWithProductCount>> GetCategoriesWithProductCountsAsync()
+        {
+            var categories = await _dbContext.Categories.Include(c => c.products).ToListAsync();
+            var categoriesWithProductCounts = new List<CategoryWithProductCount>();
+
+            if (categories == null)
+            {
+                return null;
+            }
+
+            foreach (var category in categories)
+            {
+                var categoryDto = new CategoryWithProductCount()
+                {
+                    CategoryId = category.CategoryId,
+                    CategoryName = category.CategoryName,
+                    TargetGender = GetTargetGenderString(category.CategoryTargetGender),
+                    ProductCount = category.products.Count()
+                };
+
+                categoriesWithProductCounts.Add(categoryDto);
+            }
+
+            return categoriesWithProductCounts;
+        }
+
         public async Task<List<CategoryDTO>> GetCategoryDetailsListAsync()
             {
             var categories = await _dbContext.Categories.Include(c => c.products).ToListAsync();
@@ -59,7 +85,7 @@ namespace eCommerce.Data.Repository.Implementation
             return null;
             }
 
-        public async Task<List<ProductDTO>> GetCategoryProductsListAsync(int categoryId)
+        public async Task<List<ProductDTO>> GetProductsForCategoryAsync(int categoryId)
             {
             var productList = new List<ProductDTO>();
             var category = await _dbContext.Categories.Include(category => category.products).FirstOrDefaultAsync(c => c.CategoryId == categoryId);
@@ -72,7 +98,7 @@ namespace eCommerce.Data.Repository.Implementation
         }
            
 
-        public async Task<bool> AddCategoryAsync(AddCategoryDTO categoryDTO)
+        public async Task<bool> CreateCategoryAsync(AddCategoryDTO categoryDTO)
         {
             if (categoryDTO is null)
             {

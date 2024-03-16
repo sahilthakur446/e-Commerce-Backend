@@ -17,7 +17,6 @@ namespace eCommerce.Data.DTOs
 
     public class AddCategoryDTO
     {
-        public int CategoryId { get; set; }
         [Required]
         public string CategoryName { get; set; }
         [Required]
@@ -35,4 +34,13 @@ namespace eCommerce.Data.DTOs
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; }
     }
+
+    public class CategoryWithProductCount
+    {
+        public int CategoryId { get; set; }
+        public string? CategoryName { get; set; }
+        public string? TargetGender { get; set; }
+        public int ProductCount { get; set; }
+    }
+
 }

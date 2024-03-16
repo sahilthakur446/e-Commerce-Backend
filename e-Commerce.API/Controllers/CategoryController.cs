@@ -31,8 +31,20 @@ namespace e_Commerce.API.Controllers
         }
 
         [HttpGet]
+        [Route("GetCategoriesWithProductCounts")]
+        public async Task<IActionResult> GetCategoriesWithProductCounts() 
+        {
+            var categoryList = await _categoryRepository.GetCategoriesWithProductCountsAsync();
+            if (categoryList is not null)
+            {
+                return Ok(categoryList);
+            }
+            return NotFound();
+        }
+
+        [HttpGet]
         [Route("GetCategoryDetailsList")]
-        public async Task<IActionResult> GetCategoryDetailsList() 
+        public async Task<IActionResult> GetCategoryDetailsList()
         {
             var categoryList = await _categoryRepository.GetCategoryDetailsListAsync();
             if (categoryList is not null)
@@ -46,7 +58,7 @@ namespace e_Commerce.API.Controllers
         [Route("GetCategoryProductList/{categoryId}")]
         public async Task<IActionResult> GetCategoryProductList(int categoryId)
             {
-            var productList = await _categoryRepository.GetCategoryProductsListAsync(categoryId);
+            var productList = await _categoryRepository.GetProductsForCategoryAsync(categoryId);
             if (productList is not null)
                 {
                 return Ok(productList);
@@ -56,23 +68,23 @@ namespace e_Commerce.API.Controllers
 
         [HttpPost]
         [Route("AddCategory")]
-        public async Task<IActionResult> AddCategory([FromForm] AddCategoryDTO categoryDTO)
+        public async Task<IActionResult> AddCategory([FromBody] AddCategoryDTO categoryDTO)
         {
             if (categoryDTO is null)
             {
                 return BadRequest("Invalid Input");
             }
-            bool result = await _categoryRepository.AddCategoryAsync(categoryDTO);
+            bool result = await _categoryRepository.CreateCategoryAsync(categoryDTO);
             if (result)
             {
-                return Ok();
+                return StatusCode((int)HttpStatusCode.OK);
             }
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         [HttpPut]
         [Route("UpdateCategory/{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromForm] UpdateCategoryDTO categoryDTO)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryDTO categoryDTO)
         {
             if (categoryDTO is null)
             {
