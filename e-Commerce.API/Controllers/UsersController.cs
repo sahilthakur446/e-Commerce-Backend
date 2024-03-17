@@ -21,18 +21,29 @@ namespace e_Commerce.API.Controllers
         {
             if (!await accountRepo.CheckIfEmailExistsAsync(user))
             {
-                return BadRequest("No email found");
+                return NotFound(new
+                {
+                    Message = "Email not Found"
+                });
             }
             if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password) )
             {
-                return BadRequest("Invalid Input");
+                return BadRequest(new
+                {
+                    Message = "Invalid Input"
+                });
             }
 
             if (await accountRepo.Login(user))
             {
-                return Ok(new {JWTtoken = accountRepo.JWTToken });
+                return Ok(new {
+                    message = "Login Success",
+                    jwtToken = accountRepo.JWTToken });
             }
-            return BadRequest("Wrong Password");
+            return BadRequest(new
+            {
+                Message = "Wrong Password"
+            });
         }
 
         [HttpPost("Register")]
@@ -40,7 +51,10 @@ namespace e_Commerce.API.Controllers
         {
             if (await accountRepo.CheckIfEmailExistsAsync(user))
             {
-                return BadRequest("Already User Exist with Same email");
+                return BadRequest(new
+                {
+                    Message = "Already User Exist with Same email"
+                });
             }
             if (user.Password != user.ConfirmPassword)
             {
@@ -55,7 +69,11 @@ namespace e_Commerce.API.Controllers
 
             if (await accountRepo.Register(user))
             {
-                return CreatedAtAction("Register",user);
+                return Ok(new
+                {
+                    Message = "Signup Success",
+                    JWTtoken = accountRepo.JWTToken
+                });
             }
             return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
 

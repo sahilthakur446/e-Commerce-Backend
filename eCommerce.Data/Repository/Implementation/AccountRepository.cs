@@ -137,7 +137,7 @@ namespace eCommerce.Data.Repository.Implementation
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var userClaims = new List<Claim>
     {
-        new Claim("name", user.FirstName + " " + user.LastName),
+        new Claim("name", $"{user.FirstName} {user.LastName}"),
         new Claim("email", user.Email),
         new Claim("userRole", userRole)
     };
