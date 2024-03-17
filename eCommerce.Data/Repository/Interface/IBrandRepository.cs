@@ -12,10 +12,11 @@ namespace eCommerce.Data.Repository.Interface
     {
         Task<BrandDTO> GetBrandByIdAsync(int? BrandId);
         Task<BrandDTO> GetBrandWithProductsAsync(int? BrandId);
+        Task<List<BrandWithProductCount>> GetBrandsWithProductCountsAsync();
         Task<List<BrandSummaryDTO>> GetBrandSummaryListAsync();
         Task<List<BrandDTO>> GetAllBrandsWithProductsAsync();
-        Task<bool> AddBrandAsync(AddBrandDTO BrandDTO);
-        Task<bool> UpdateBrandAsync(AddBrandDTO BrandDTO);
+        Task<bool> AddBrandAsync(CreateUpdateBrandDto BrandDTO);
+        Task<bool> UpdateBrandAsync(int id, CreateUpdateBrandDto BrandDTO);
         Task<bool> DeleteBrandAsync(int? BrandId);
     }
 }

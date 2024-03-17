@@ -1,5 +1,6 @@
 ﻿using eCommerce.Data.DTOs;
 using eCommerce.Data.Models;
+using eCommerce.Data.Repository.Implementation;
 using eCommerce.Data.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -55,6 +56,18 @@ namespace e_Commerce.API.Controllers
         }
 
         [HttpGet]
+        [Route("GetBrandsWithProductCounts")]
+        public async Task<IActionResult> GetBrandsWithProductCounts()
+            {
+            var brandList = await _brandRepository.GetBrandsWithProductCountsAsync();
+            if (brandList is not null)
+                {
+                return Ok(brandList);
+                }
+            return NotFound();
+            }
+
+        [HttpGet]
         [Route("GetAllBrandsWithProducts")]
         public async Task<IActionResult> GetBrandDetailsList()
         {
@@ -68,7 +81,7 @@ namespace e_Commerce.API.Controllers
 
         [HttpPost]
         [Route("AddBrand")]
-        public async Task<IActionResult> AddBrand([FromForm] AddBrandDTO brandDTO)
+        public async Task<IActionResult> AddBrand([FromBody] CreateUpdateBrandDto brandDTO)
         {
             if (brandDTO is null)
             {
@@ -83,14 +96,14 @@ namespace e_Commerce.API.Controllers
         }
 
         [HttpPut]
-        [Route("UpdateBrand")]
-        public async Task<IActionResult> UpdateBrand([FromForm] AddBrandDTO brandDTO)
+        [Route("UpdateBrand/{brandId}")]
+        public async Task<IActionResult> UpdateBrand(int brandId, [FromBody] CreateUpdateBrandDto brandDTO)
         {
             if (brandDTO is null)
             {
                 return BadRequest("Invalid Input");
             }
-            bool result = await _brandRepository.UpdateBrandAsync(brandDTO);
+            bool result = await _brandRepository.UpdateBrandAsync(brandId,brandDTO);
             if (result)
             {
                 return Ok();
