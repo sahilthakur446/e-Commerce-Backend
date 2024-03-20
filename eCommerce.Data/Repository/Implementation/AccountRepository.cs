@@ -139,7 +139,7 @@ namespace eCommerce.Data.Repository.Implementation
     {
         new Claim("name", $"{user.FirstName} {user.LastName}"),
         new Claim("email", user.Email),
-        new Claim("userRole", userRole)
+        new Claim(ClaimTypes.Role, userRole)
     };
             var tokenOptions = new JwtSecurityToken(
                 issuer: config["Jwt:Issuer"],
