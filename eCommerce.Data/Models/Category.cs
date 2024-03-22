@@ -15,7 +15,7 @@ namespace eCommerce.Data.Models
 
         public string CategoryName { get; set; }
         [EnumDataType(typeof(GenderApplicability))]
-        public GenderApplicability? CategoryTargetGender { get; set; }
+        public GenderApplicability CategoryTargetGender { get; set; }
         public List<Product> products { get; set; }
     }
 }

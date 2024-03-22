@@ -116,6 +116,27 @@ namespace eCommerce.Data.Repository.Implementation
             return false;
             }
 
+        public async Task<bool> ChangeUserPassword(ChangePasswordDTO password) 
+            {
+            if (password is null) 
+                {
+                return false;
+                }
+            var user = await context.Users.FirstOrDefaultAsync(u => u.UserId == password.UserId);
+            if (user != null) 
+                {
+                if (user.Password == password.NewPassword) 
+                    {
+                    return false;
+                    }
+                user.Password = password.NewPassword;
+                await context.SaveChangesAsync();
+                return true;
+                }
+            return false;
+            }
+
+
         private async Task<string> UserRoleFinder(int id)
             {
             var role = await context.UserRoles.FindAsync(id);
@@ -136,11 +157,11 @@ namespace eCommerce.Data.Repository.Implementation
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var userClaims = new List<Claim>
-    {
-        new Claim("name", $"{user.FirstName} {user.LastName}"),
-        new Claim("email", user.Email),
-        new Claim(ClaimTypes.Role, userRole)
-    };
+            {
+                new Claim("name", $"{user.FirstName} {user.LastName}"),
+                new Claim("email", user.Email),
+                new Claim(ClaimTypes.Role, userRole)
+            };
             var tokenOptions = new JwtSecurityToken(
                 issuer: config["Jwt:Issuer"],
                 audience: config["Jwt:Audience"],

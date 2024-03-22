@@ -1,5 +1,6 @@
 ﻿using eCommerce.Data.DTOs;
 using eCommerce.Data.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
@@ -29,7 +30,7 @@ namespace e_Commerce.API.Controllers
             }
             return NotFound();
         }
-
+        [Authorize(Roles ="Admin")]
         [HttpGet]
         [Route("GetCategoriesWithProductCounts")]
         public async Task<IActionResult> GetCategoriesWithProductCounts() 

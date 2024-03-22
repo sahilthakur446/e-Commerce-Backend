@@ -36,5 +36,7 @@ namespace eCommerce.Data.Models
         [ForeignKey("UserRole")]
         public int UserRoleId { get; set; }
         public UserRole UserRole { get; set; }
+
+        public List<UserAddress> UserAddresses { get; set; }
         }
     }
