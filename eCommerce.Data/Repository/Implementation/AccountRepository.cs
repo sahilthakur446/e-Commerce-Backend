@@ -166,7 +166,7 @@ namespace eCommerce.Data.Repository.Implementation
                 issuer: config["Jwt:Issuer"],
                 audience: config["Jwt:Audience"],
                 claims: userClaims,
-                expires: DateTime.Now.AddMinutes(120),
+                expires: DateTime.Now.AddSeconds(60),
                 signingCredentials: credentials
             );
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);

@@ -226,7 +226,7 @@ namespace eCommerce.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserAddress");
+                    b.ToTable("UserAddresses");
                 });
 
             modelBuilder.Entity("eCommerce.Data.Models.UserRole", b =>
