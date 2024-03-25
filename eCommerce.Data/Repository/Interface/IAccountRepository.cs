@@ -10,5 +10,8 @@ namespace eCommerce.Data.Repository.Interface
         Task<bool> Login(LoginDTO user);
         Task<bool> CheckIfEmailExistsAsync(LoginDTO user);
         Task<bool> CheckIfEmailExistsAsync(RegisterDTO user);
+        Task<UpdateUserDTO> GetUserInfo(int userId);
+        Task<bool> EditUserInformation(int userId, UpdateUserDTO updatedUser);
+        Task<bool> ChangeUserPassword(int UserId, ChangePasswordDTO password);
     }
 }

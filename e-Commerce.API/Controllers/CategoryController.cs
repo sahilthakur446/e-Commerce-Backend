@@ -34,6 +34,7 @@ namespace e_Commerce.API.Controllers
         [HttpGet]
         [Route("GetCategoriesWithProductCounts")]
         public async Task<IActionResult> GetCategoriesWithProductCounts() 
+        
         {
             var categoryList = await _categoryRepository.GetCategoriesWithProductCountsAsync();
             if (categoryList is not null)
@@ -87,16 +88,26 @@ namespace e_Commerce.API.Controllers
         [Route("UpdateCategory/{id}")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryDTO categoryDTO)
         {
-            if (categoryDTO is null)
+            try
             {
-                return BadRequest("Invalid Input");
+                if (categoryDTO is null)
+                {
+                    return BadRequest("Invalid Input");
+                }
+                bool result = await _categoryRepository.UpdateCategoryAsync(id, categoryDTO);
+                if (result)
+                {
+                    return Ok();
+                }
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-            bool result = await _categoryRepository.UpdateCategoryAsync(id,categoryDTO);
-            if (result)
+            catch (Exception ex)
             {
-                return Ok();
+                return BadRequest(new
+                {
+                    Messsage = ex.Message
+                });
             }
-            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         [HttpDelete]

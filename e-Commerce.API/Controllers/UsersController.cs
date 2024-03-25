@@ -1,8 +1,10 @@
 ﻿using eCommerce.Data.Data;
 using eCommerce.Data.DTOs;
 using eCommerce.Data.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace e_Commerce.API.Controllers
 {
@@ -58,13 +60,17 @@ namespace e_Commerce.API.Controllers
             }
             if (user.Password != user.ConfirmPassword)
             {
-                return BadRequest("Password and Confirm Password are not same");
+                return BadRequest(new
+                { 
+                    Message = "Password and Confirm Password are not same" 
+                });
             }
             if (string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password) 
                 || string.IsNullOrEmpty(user.ConfirmPassword) || string.IsNullOrEmpty(user.FirstName)
                 || string.IsNullOrEmpty(user.LastName))
             {
-                return BadRequest("Invalid Input");
+                return BadRequest(new
+                    { Message = "Invalid Input" });
             }
 
             if (await accountRepo.Register(user))
@@ -72,11 +78,103 @@ namespace e_Commerce.API.Controllers
                 return Ok(new
                 {
                     Message = "Signup Success",
-                    JWTtoken = accountRepo.JWTToken
                 });
             }
             return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
 
+        }
+
+        [Authorize]
+        [HttpGet("GetUserInfo/{userId}")]
+        public async Task<IActionResult> GetUserInfo(int? userId)
+        {
+            if (userId is null)
+            {
+                return BadRequest(new
+                {
+                    Message = "User id can not be null"
+                });
+            }
+            var user = await accountRepo.GetUserInfo((int)userId);
+            if (user is null) 
+            {
+                return NotFound(new
+                {
+                    Message = "No user found"
+                });
+            }
+            return Ok(user);
+        }
+
+        [Authorize]
+        [HttpPut("UpdateUserInfo/{userId}")]
+        public async Task<IActionResult> UpdateUserInfo(int? userId, [FromBody] UpdateUserDTO updatedUser)
+        {
+            try
+            {
+                if (userId is null)
+            {
+                return BadRequest(new
+                {
+                    Message = "User id can not be null"
+                });
+            }
+            var user = await accountRepo.EditUserInformation((int)userId,updatedUser);
+            if (!user)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError,"Internal Server Error");
+            }
+            return Ok(new 
+            {
+                Message = "User updated Successfully"
+            });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpPut("ChangePassword/{userId}")]
+        public async Task<IActionResult> ChangePassword(int? userId, [FromBody] ChangePasswordDTO password)
+        {
+            try
+            {
+                if (userId is null)
+                {
+                    return BadRequest(new
+                    {
+                        Message = "User id can not be null"
+                    });
+                }
+                if (string.IsNullOrEmpty(password.OldPassword) || string.IsNullOrEmpty(password.NewPassword))
+                {
+                    return BadRequest(new
+                    {
+                        Message = "Please provide both old and new password"
+                    });
+                }
+                var result = await accountRepo.ChangeUserPassword((int)userId, password);
+                if (!result)
+                {
+                    return StatusCode((int)HttpStatusCode.InternalServerError, "Failed to change password");
+                }
+                return Ok(new
+                {
+                    Message = "Password updated successfully"
+                });
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(new
+                {
+                    Message = ex.Message
+                });
+            }
         }
     }
 }
