@@ -6,13 +6,13 @@ namespace eCommerce.Data.Repository.Interface
     {
     public interface IProductRepository
         {
-        Task<List<ProductDTO>> GetAllProductsAsync();
-        Task<ProductDTO> GetProduct(int id);
-        Task<List<ProductDTO>> GetProductsAbovePriceAsync(int minPrice);
-        Task<List<ProductDTO>> GetProductsBelowPriceAsync(int maxPrice);
-        Task<List<ProductDTO>> GetProductsWithinPriceRangeAsync(int minPrice, int maxPrice);
-        Task<bool> AddProductAsync(ProductDTO product);
+        Task<List<ProductShowcaseDTO>> GetAllProductsAsync();
+        Task<ProductShowcaseDTO> GetProduct(int id);
+        Task<List<ProductShowcaseDTO>> GetProductsAbovePriceAsync(int minPrice);
+        Task<List<ProductShowcaseDTO>> GetProductsBelowPriceAsync(int maxPrice);
+        Task<List<ProductShowcaseDTO>> GetProductsWithinPriceRangeAsync(int minPrice, int maxPrice);
+        Task<bool> AddProductAsync(AddProductDTO product);
         Task<bool> DeleteProductAsync(int? id);
-        Task<bool> UpdateProductAsync(int id, ProductDTO productDTO);
+        Task<bool> UpdateProductAsync(int id, UpdateProductDTO productDTO);
         }
     }

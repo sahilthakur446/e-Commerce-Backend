@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using eCommerce.Utilities.Enums;
 using static eCommerce.Utilities.GenderConverter;
+using AutoMapper;
 
 namespace eCommerce.Data.Repository.Implementation
 {
@@ -14,43 +15,39 @@ namespace eCommerce.Data.Repository.Implementation
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IMapper mapper;
 
-        public ProductRepository(ApplicationDbContext dbContext, IWebHostEnvironment hostingEnvironment)
+        public ProductRepository(ApplicationDbContext dbContext, IWebHostEnvironment hostingEnvironment, IMapper _mapper)
         {
             _dbContext = dbContext;
             _hostingEnvironment = hostingEnvironment;
-        }
+            mapper = _mapper;
+            }
 
-        public async Task<List<ProductDTO>> GetAllProductsAsync()
+        public async Task<List<ProductShowcaseDTO>> GetAllProductsAsync()
         {
             try
             {
-                var products = await _dbContext.Products.Include(product => product.Brand).ToListAsync();
-                var productDtos = new List<ProductDTO>();
-
-                foreach (var product in products)
-                {
-                    var productDto = ProductToProductDTOMapper(product);
-                    if (!(productDto is null))
-                    {
-                        productDtos.Add(productDto);
-                    }
-
-                }
+                var products = await _dbContext.Products
+                    .Include(product => product.Brand)
+                    .Include(product => product.Category)
+                    .ToListAsync();
+                var productDtos = mapper.Map<List<ProductShowcaseDTO>>(products);
+                
                 return productDtos;
             }
             catch (Exception error)
             {
-                throw error;
+                throw new Exception("Some Error Occured");
             }
         }
 
-        public async Task<ProductDTO> GetProduct(int id)
+        public async Task<ProductShowcaseDTO> GetProduct(int id)
         {
             var product = await _dbContext.Products.Include(p => p.Brand).Include(p => p.Category).FirstOrDefaultAsync(p => p.ProductId == id);
             if (product != null)
             {
-                var productDto = ProductToProductDTOMapper(product);
+                var productDto = mapper.Map<ProductShowcaseDTO>(product);
                 if (!(productDto is null))
                 {
                     return productDto;
@@ -59,7 +56,7 @@ namespace eCommerce.Data.Repository.Implementation
             return null;
         }
 
-        public async Task<List<ProductDTO>> GetProductsAbovePriceAsync(int minPrice)
+        public async Task<List<ProductShowcaseDTO>> GetProductsAbovePriceAsync(int minPrice)
             {
             var productList = await _dbContext.Products
                 .Include(p => p.Brand)
@@ -67,7 +64,7 @@ namespace eCommerce.Data.Repository.Implementation
                 .Where(p => p.Price >= minPrice)
                 .ToListAsync();
 
-            var productDTOsList = MapProductsToProductDTOs(productList);
+            var productDTOsList = mapper.Map<List<ProductShowcaseDTO>>(productList);
 
             if (!productDTOsList.Any())
                 {
@@ -76,7 +73,7 @@ namespace eCommerce.Data.Repository.Implementation
             return productDTOsList;
             }
 
-        public async Task<List<ProductDTO>> GetProductsBelowPriceAsync(int maxPrice)
+        public async Task<List<ProductShowcaseDTO>> GetProductsBelowPriceAsync(int maxPrice)
             {
             var productList = await _dbContext.Products
                 .Include(p => p.Brand)
@@ -84,8 +81,7 @@ namespace eCommerce.Data.Repository.Implementation
                 .Where(p => p.Price <= maxPrice)
                 .ToListAsync();
 
-            var productDTOsList = MapProductsToProductDTOs(productList);
-
+            var productDTOsList = mapper.Map<List<ProductShowcaseDTO>>(productList);
             if (!productDTOsList.Any())
             {
                 return null;
@@ -93,7 +89,7 @@ namespace eCommerce.Data.Repository.Implementation
             return productDTOsList;
         }
 
-        public async Task<List<ProductDTO>> GetProductsWithinPriceRangeAsync(int minPrice, int maxPrice)
+        public async Task<List<ProductShowcaseDTO>> GetProductsWithinPriceRangeAsync(int minPrice, int maxPrice)
             {
             var productList = await _dbContext.Products
                 .Include(p => p.Brand)
@@ -101,20 +97,20 @@ namespace eCommerce.Data.Repository.Implementation
                 .Where(p => (p.Price >= minPrice) && (p.Price <= maxPrice) )
                 .ToListAsync();
 
-            var productDTOsList = MapProductsToProductDTOs(productList);
+            var productDTOsList = mapper.Map<List<ProductShowcaseDTO>>(productList);
 
             if (!productDTOsList.Any())
                 {
-                return null;
+                throw new Exception("No Product Found");
                 }
             return productDTOsList;
             }
 
-        private ProductDTO ProductToProductDTOMapper(Product product)
+        private ProductShowcaseDTO ProductToProductDTOMapper(Product product)
         {
             if (!(product is null))
             {
-                var productDto = new ProductDTO
+                var productDto = new ProductShowcaseDTO
                     {
                     ProductId = product.ProductId,
                     ProductName = product.ProductName,
@@ -125,7 +121,6 @@ namespace eCommerce.Data.Repository.Implementation
                     StockQuantity = product.StockQuantity,
                     CategoryId = product.CategoryId,
                     BrandId = product.BrandId,
-                    BrandName = product.Brand.BrandName
                 };
                 return productDto;
             }
@@ -170,24 +165,12 @@ namespace eCommerce.Data.Repository.Implementation
             return false;
         }
 
-        public async Task<bool> AddProductAsync(ProductDTO productDto)
+        public async Task<bool> AddProductAsync(AddProductDTO productDto)
         {
             if (!(productDto is null))
             {
-                var product = new Product
-                {
-                    ProductName = productDto.ProductName,
-                    ProductDescription = productDto.ProductDescription,
-                    TargetGender = GetTargetGender(productDto.TargetGender),
-                    Price = (int)productDto.Price,
-                    StockQuantity = (int)productDto.StockQuantity,
-                    ImagePath = await SaveImageAsync(productDto.CategoryId, productDto.Image),
-                    CategoryId =(int) productDto.CategoryId,
-                    BrandId = (int)productDto.BrandId,
-                    DateAdded = DateTime.Now,
-                    TimesBought = 0
-                };
-
+                var product = mapper.Map<Product>(productDto);
+                product.ImagePath = await SaveImageAsync(productDto.CategoryId,productDto.Image);
                 await _dbContext.Products.AddAsync(product);
                 await _dbContext.SaveChangesAsync();
 
@@ -197,10 +180,10 @@ namespace eCommerce.Data.Repository.Implementation
             return false;
         }
 
-        public async Task<bool> UpdateProductAsync(int id, ProductDTO productDTO)
+        public async Task<bool> UpdateProductAsync(int id, UpdateProductDTO productDTO)
         {
             string updateImagePath;
-            string oldImagePath = null;
+            string oldImagePath;
             if (!(productDTO is null))
             {
                 var product = await _dbContext.Products.FindAsync(id);
@@ -223,12 +206,7 @@ namespace eCommerce.Data.Repository.Implementation
                     }
 
 
-                    product.ProductName = productDTO.ProductName ?? product.ProductName;
-                    product.ProductDescription = productDTO.ProductDescription ?? product.ProductDescription;
-                    product.Price = productDTO.Price ?? product.Price;
-                    product.StockQuantity = productDTO.StockQuantity ?? product.StockQuantity;
-                    product.CategoryId = productDTO.CategoryId ?? product.CategoryId;
-                    product.BrandId = productDTO.BrandId ?? product.BrandId;
+                  var x =  mapper.Map(productDTO,product);
                     await _dbContext.SaveChangesAsync();
                     return true;
                 }
@@ -261,30 +239,6 @@ namespace eCommerce.Data.Repository.Implementation
             return false;
         }
 
-        private List<ProductDTO> MapProductsToProductDTOs(List<Product> products)
-            {
-            var productDTOs = new List<ProductDTO>();
 
-            if (!( products is null ))
-                {
-                foreach (var product in products)
-                    {
-                    var productDto = new ProductDTO
-                        {
-                        ProductId = product.ProductId,
-                        ProductName = product.ProductName,
-                        ProductDescription = product.ProductDescription,
-                        Price = product.Price,
-                        ImagePath = product.ImagePath,
-                        StockQuantity = product.StockQuantity,
-                        CategoryId = product.CategoryId,
-                        BrandId = product.BrandId
-                        };
-                    productDTOs.Add(productDto);
-                    }
-                return productDTOs;
-                }
-            return null;
-            }
-        }
+    }
 }

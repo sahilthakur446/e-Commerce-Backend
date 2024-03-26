@@ -74,17 +74,23 @@ namespace e_Commerce.API.Controllers
 
         public async Task<IActionResult> GetProductsWithinPriceRange(int minPrice, int maxPrice)
             {
-            var products = await productRepository.GetProductsWithinPriceRangeAsync(minPrice,maxPrice);
-            if (products.Any())
-                {
-                return Ok(products);
+            try {
+                var products = await productRepository.GetProductsWithinPriceRangeAsync(minPrice, maxPrice);
+                if (products.Any())
+                    {
+                    return Ok(products);
+                    }
+                return NotFound();
                 }
-            return NotFound();
+            catch (Exception ex) 
+                {
+                return BadRequest(ex.Message);
+                }
             }
 
         [HttpPost]
         [Route("AddProduct")]
-        public async Task<IActionResult> AddProduct([FromForm] ProductDTO product)
+        public async Task<IActionResult> AddProduct([FromForm] AddProductDTO product)
         {
             if (product == null)
             {
@@ -107,7 +113,7 @@ namespace e_Commerce.API.Controllers
 
         [HttpPut]
         [Route("UpdateProduct/{id}")]
-        public async Task<IActionResult> UpdateProduct(int id,[FromForm] ProductDTO product)
+        public async Task<IActionResult> UpdateProduct(int id,[FromForm] UpdateProductDTO product)
         {
             bool result = await productRepository.UpdateProductAsync(id, product);
             if (result)

@@ -9,13 +9,32 @@ using static eCommerce.Data.Models.Product;
 
 namespace eCommerce.Data.DTOs
     {
-    public class ProductDTO
+    public class AddProductDTO
         {
         [Key]
         public int ProductId { get; set; }
 
-        public string? ProductName { get; set; }
+        public string ProductName { get; set; }
         
+        public string ProductDescription { get; set; }
+        public string TargetGender { get; set; }
+
+        public int Price { get; set; }
+        public int StockQuantity { get; set; }
+        [SwaggerParameter(Required = false)]
+        public IFormFile Image { get; set; }
+        
+        public int CategoryId { get; set; }
+        public int BrandId { get; set; }
+        }
+
+    public class UpdateProductDTO
+        {
+        [Key]
+        public int? ProductId { get; set; }
+
+        public string? ProductName { get; set; }
+
         public string? ProductDescription { get; set; }
         public string? TargetGender { get; set; }
 
@@ -23,10 +42,26 @@ namespace eCommerce.Data.DTOs
         public int? StockQuantity { get; set; }
         [SwaggerParameter(Required = false)]
         public IFormFile? Image { get; set; }
-        
-        public string? ImagePath { get; set; }
         public int? CategoryId { get; set; }
         public int? BrandId { get; set; }
-        public string? BrandName { get; set; }
+        }
+
+    public class ProductShowcaseDTO
+        {
+        [Key]
+        public int ProductId { get; set; }
+
+        public string ProductName { get; set; }
+
+        public string ProductDescription { get; set; }
+        public string TargetGender { get; set; }
+
+        public int Price { get; set; }
+        public int StockQuantity { get; set; }
+        public string ImagePath { get; set; }
+        public int CategoryId { get; set; }
+        public int BrandId { get; set; }
+        public string CategoryName { get; set; }
+        public string BrandName { get; set; }
         }
     }

@@ -160,16 +160,16 @@ namespace eCommerce.Data.Repository.Implementation
             }
             return false;
         }
-        private List<ProductDTO> MapProductsToProductDTOs(List<Product> Products)
+        private List<ProductShowcaseDTO> MapProductsToProductDTOs(List<Product> Products)
         {
-            var productDTOs = new List<ProductDTO>();
+            var productDTOs = new List<ProductShowcaseDTO>();
 
             if (!(Products is null))
             {
                 foreach (var product in Products)
                 {
-                    var productDto = new ProductDTO
-                    {
+                    var productDto = new ProductShowcaseDTO
+                        {
                         ProductId = product.ProductId,
                         ProductName = product.ProductName,
                         ProductDescription = product.ProductDescription,
