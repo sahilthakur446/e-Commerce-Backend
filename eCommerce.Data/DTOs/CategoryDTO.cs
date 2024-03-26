@@ -12,7 +12,7 @@ namespace eCommerce.Data.DTOs
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; }
         public string? TargetGender { get; set; }
-        public List<ProductShowcaseDTO>? productDTOs { get; set; }
+        public List<ProductInfoDTO>? productDTOs { get; set; }
     }
 
     public class AddCategoryDTO

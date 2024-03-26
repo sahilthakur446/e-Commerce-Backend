@@ -11,9 +11,6 @@ namespace eCommerce.Data.DTOs
     {
     public class AddProductDTO
         {
-        [Key]
-        public int ProductId { get; set; }
-
         public string ProductName { get; set; }
         
         public string ProductDescription { get; set; }
@@ -30,9 +27,6 @@ namespace eCommerce.Data.DTOs
 
     public class UpdateProductDTO
         {
-        [Key]
-        public int? ProductId { get; set; }
-
         public string? ProductName { get; set; }
 
         public string? ProductDescription { get; set; }
@@ -46,8 +40,8 @@ namespace eCommerce.Data.DTOs
         public int? BrandId { get; set; }
         }
 
-    public class ProductShowcaseDTO
-        {
+    public class ProductInfoDTO
+    {
         [Key]
         public int ProductId { get; set; }
 

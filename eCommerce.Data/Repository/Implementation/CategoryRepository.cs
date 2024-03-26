@@ -85,9 +85,9 @@ namespace eCommerce.Data.Repository.Implementation
             return null;
             }
 
-        public async Task<List<ProductShowcaseDTO>> GetProductsForCategoryAsync(int categoryId)
+        public async Task<List<ProductInfoDTO>> GetProductsForCategoryAsync(int categoryId)
             {
-            var productList = new List<ProductShowcaseDTO>();
+            var productList = new List<ProductInfoDTO>();
             var category = await _dbContext.Categories.Include(category => category.products).FirstOrDefaultAsync(c => c.CategoryId == categoryId);
             if (category is null)
             {
@@ -146,15 +146,15 @@ namespace eCommerce.Data.Repository.Implementation
             }
             return false;
         }
-        private List<ProductShowcaseDTO> MapProductsToProductDTOs(List<Product> products)
+        private List<ProductInfoDTO> MapProductsToProductDTOs(List<Product> products)
         {
-            var productDTOs = new List<ProductShowcaseDTO>();
+            var productDTOs = new List<ProductInfoDTO>();
 
             if (!(products is null))
             {
                 foreach (var product in products)
                 {
-                    var productDto = new ProductShowcaseDTO
+                    var productDto = new ProductInfoDTO
                         {
                         ProductId = product.ProductId,
                         ProductName = product.ProductName,

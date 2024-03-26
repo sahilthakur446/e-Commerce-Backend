@@ -11,7 +11,7 @@ namespace eCommerce.Data.DTOs
     {
         public int BrandId { get; set; }
         public string? BrandName { get; set; }
-        public List<ProductShowcaseDTO>? productDTOs { get; set; }
+        public List<ProductInfoDTO>? productDTOs { get; set; }
     }
 
     public class CreateUpdateBrandDto
