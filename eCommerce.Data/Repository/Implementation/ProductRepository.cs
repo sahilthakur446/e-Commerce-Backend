@@ -9,6 +9,7 @@ using eCommerce.Utilities.Enums;
 using static eCommerce.Utilities.GenderConverter;
 using AutoMapper;
 using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace eCommerce.Data.Repository.Implementation
 {
@@ -27,20 +28,20 @@ namespace eCommerce.Data.Repository.Implementation
 
         public async Task<List<ProductInfoDTO>> GetAllProductsAsync()
         {
-            try
-            {
+            
                 var products = await _dbContext.Products
                     .Include(product => product.Brand)
                     .Include(product => product.Category)
                     .ToListAsync();
-                var productDtos = mapper.Map<List<ProductInfoDTO>>(products);
+            if (!products.Any())
+            {
+                throw new Exception("No Product Found");
+            }
+            var productDtos = mapper.Map<List<ProductInfoDTO>>(products);
                 
                 return productDtos;
-            }
-            catch (Exception error)
-            {
-                throw new Exception("Some Error Occured");
-            }
+            
+           
         }
 
         public async Task<ProductInfoDTO> GetProduct(int id)
@@ -49,12 +50,9 @@ namespace eCommerce.Data.Repository.Implementation
             if (product != null)
             {
                 var productDto = mapper.Map<ProductInfoDTO>(product);
-                if (!(productDto is null))
-                {
-                    return productDto;
-                }
+                return productDto;
             }
-            return null;
+            throw new Exception("No product Found");
         }
 
         public async Task<List<ProductInfoDTO>> GetProductsAbovePriceAsync(int minPrice)
@@ -69,7 +67,7 @@ namespace eCommerce.Data.Repository.Implementation
 
             if (!productDTOsList.Any())
                 {
-                return null;
+                throw new Exception("No Product Found");
                 }
             return productDTOsList;
             }
@@ -85,8 +83,8 @@ namespace eCommerce.Data.Repository.Implementation
             var productDTOsList = mapper.Map<List<ProductInfoDTO>>(productList);
             if (!productDTOsList.Any())
             {
-                return null;
-            }
+                throw new Exception("No Product Found");
+                }
             return productDTOsList;
         }
 
@@ -106,54 +104,41 @@ namespace eCommerce.Data.Repository.Implementation
                 }
             return productDTOsList;
             }
-
-        private ProductInfoDTO ProductToProductDTOMapper(Product product)
-        {
-            if (!(product is null))
-            {
-                var productDto = new ProductInfoDTO
-                    {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    ProductDescription = product.ProductDescription,
-                    Price = product.Price,
-                    TargetGender = GetTargetGenderString(product.TargetGender),
-                    ImagePath = product.ImagePath,
-                    StockQuantity = product.StockQuantity,
-                    CategoryId = product.CategoryId,
-                    BrandId = product.BrandId,
-                };
-                return productDto;
-            }
-            return null;
-        }
         
         private async Task<string> SaveImageAsync(int? categoryId, IFormFile imageFile)
         {
-            var category = await _dbContext.Categories.FindAsync(categoryId);
-            string categoryName = category.CategoryName;
-
-            if (!string.IsNullOrEmpty(categoryName))
-            {
-                string imagesFolderPath = Path.Combine(_hostingEnvironment.WebRootPath, "images", categoryName.ToLower());
-                if (!Directory.Exists(imagesFolderPath))
+            try
                 {
-                    Directory.CreateDirectory(imagesFolderPath);
+                var category = await _dbContext.Categories.FindAsync(categoryId);
+                string categoryName = category.CategoryName;
+
+                if (!string.IsNullOrEmpty(categoryName))
+                    {
+                    string imagesFolderPath = Path.Combine(_hostingEnvironment.WebRootPath, "images", categoryName.ToLower());
+                    if (!Directory.Exists(imagesFolderPath))
+                        {
+                        Directory.CreateDirectory(imagesFolderPath);
+                        }
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    string fullImagePath = Path.Combine(imagesFolderPath, uniqueFileName);
+
+                    using (var fileStream = new FileStream(fullImagePath, FileMode.Create))
+                        {
+                        await imageFile.CopyToAsync(fileStream);
+                        }
+
+                    return Path.Combine("images", categoryName.ToLower(), uniqueFileName);
+                    }
+
+                return string.Empty;
                 }
-
-                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-                string fullImagePath = Path.Combine(imagesFolderPath, uniqueFileName);
-
-                using (var fileStream = new FileStream(fullImagePath, FileMode.Create))
+            catch 
                 {
-                    await imageFile.CopyToAsync(fileStream);
+                throw new Exception("Some Error Occured while saving the image");
                 }
-
-                return Path.Combine("images", categoryName.ToLower(), uniqueFileName);
-            }
-
-            return string.Empty;
         }
+
 
         private bool DeleteImage(string imagePath)
         {
@@ -163,49 +148,57 @@ namespace eCommerce.Data.Repository.Implementation
                 File.Delete(imageFullPath);
                 return true;
             }
-            return false;
+            if (!File.Exists(imageFullPath))
+            {
+                return true;
+            }
+            throw new Exception("Some Error Occured while deleting the Image");
         }
 
         public async Task<bool> AddProductAsync(AddProductDTO productDto)
         {
-            if (!(productDto is null))
+            if (productDto.Image is null)
             {
+                throw new Exception("Please provide product image");
+            }
+            try
+                {
                 var product = mapper.Map<Product>(productDto);
-                product.ImagePath = await SaveImageAsync(productDto.CategoryId,productDto.Image);
+                product.ImagePath = await SaveImageAsync(productDto.CategoryId, productDto.Image);
                 await _dbContext.Products.AddAsync(product);
                 await _dbContext.SaveChangesAsync();
-
                 return true;
-            }
+                }
+            catch (Exception ex) 
+                {
+                throw new Exception("Some error occured");
+                }
+            
 
-            return false;
+            throw new Exception("Some Error Occured");
         }
 
         public async Task<bool> UpdateProductAsync(int id, UpdateProductDTO productDTO)
         {
-            string updateImagePath;
+            string updatedImagePath;
             string oldImagePath;
-            if (!(productDTO is null))
-            {
-                var product = await _dbContext.Products.FindAsync(id);
-                if (!(product is null))
+
+            var product = await _dbContext.Products.FindAsync(id);
+            if (product is null)
                 {
-                    if (!(productDTO.Image is null))
-                    {
-                        oldImagePath = product.ImagePath;
-                        updateImagePath = await SaveImageAsync(productDTO.CategoryId, productDTO.Image);
-                        product.ImagePath = updateImagePath;
-                        if (!string.IsNullOrEmpty(oldImagePath))
-                        {
-                            if (!DeleteImage(oldImagePath))
-                            {
-                                throw new Exception("Unable to Delete Image");
-                            }
-                            return true;
-                        }
+                throw new Exception("Unable to find product for specified Id");
+                }
+            if (productDTO.Image is not null)
+            {
+                oldImagePath = product.ImagePath;
+                updatedImagePath = await SaveImageAsync(productDTO.CategoryId, productDTO.Image);
+                product.ImagePath = updatedImagePath;
 
-                    }
-
+                if (!DeleteImage(oldImagePath))
+                {
+                  throw new Exception("Unable to Delete Image");
+                }
+            }
                     product.ProductName = productDTO.ProductName ?? product.ProductName;
                     product.ProductDescription = productDTO.ProductDescription ?? product.ProductDescription;
                     if (productDTO.TargetGender is not null)
@@ -220,10 +213,7 @@ namespace eCommerce.Data.Repository.Implementation
 
                     await _dbContext.SaveChangesAsync();
                     return true;
-                }
-                return false;
-            }
-            return false;
+            
         }
 
 

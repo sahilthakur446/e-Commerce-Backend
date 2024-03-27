@@ -16,7 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>
     (options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DBCS")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DBCSS")));
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

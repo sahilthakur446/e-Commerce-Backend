@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using System.Net;
 
 namespace e_Commerce.API.Controllers
@@ -61,13 +62,17 @@ namespace e_Commerce.API.Controllers
 
         public async Task<IActionResult> GetProductsBelowPriceRange(int maxPrice)
             {
-            var products = await productRepository.GetProductsBelowPriceAsync(maxPrice);
-            if (products.Any())
-                {
-                return Ok(products);
+            try {
+                var products = await productRepository.GetProductsBelowPriceAsync(maxPrice);
+                if (products.Any())
+                    {
+                    return Ok(products);
+                    }
+                return NotFound();
                 }
-            return NotFound();
+            catch (Exception ex) { return BadRequest(ex.Message); }
             }
+          
 
 
         [HttpGet("GetProductsWithinPriceRange/{minPrice}/{maxPrice}")]
@@ -96,7 +101,8 @@ namespace e_Commerce.API.Controllers
             {
                 return BadRequest("Product is null");
             }
-            return await productRepository.AddProductAsync(product)? Ok(): StatusCode((int)HttpStatusCode.InternalServerError);
+            return await productRepository.AddProductAsync(product)? Ok( new {
+                Message = "Product Added Successfuly"} ): StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         [HttpDelete]
@@ -106,7 +112,7 @@ namespace e_Commerce.API.Controllers
            bool result =  await productRepository.DeleteProductAsync(id);
             if (result) 
             {
-                return Ok();
+                return Ok( new { Message= "Product Deleted Succwssfully"});
             }
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
@@ -118,8 +124,8 @@ namespace e_Commerce.API.Controllers
             bool result = await productRepository.UpdateProductAsync(id, product);
             if (result)
             {
-                return Ok(product);
-            }
+                return Ok(new { Message = "Product Updated Succwssfully" });
+                }
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
     }
