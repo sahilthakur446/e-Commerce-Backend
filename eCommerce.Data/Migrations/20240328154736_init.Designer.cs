@@ -12,7 +12,7 @@ using eCommerce.Data.Data;
 namespace eCommerce.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240328061025_init")]
+    [Migration("20240328154736_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -191,7 +191,6 @@ namespace eCommerce.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserAddressId"));
 
                     b.Property<string>("Area")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
@@ -257,9 +256,6 @@ namespace eCommerce.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserWishlistId"));
 
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -324,13 +320,11 @@ namespace eCommerce.Data.Migrations
 
             modelBuilder.Entity("eCommerce.Data.Models.UserAddress", b =>
                 {
-                    b.HasOne("eCommerce.Data.Models.User", "User")
+                    b.HasOne("eCommerce.Data.Models.User", null)
                         .WithMany("UserAddresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("eCommerce.Data.Models.UserWishlist", b =>

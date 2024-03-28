@@ -15,7 +15,7 @@ namespace eCommerce.Data.Models
         [Required]
         public string FullName { get; set; }
         [Required]
-        public string MobileNumber { get; set; }
+        public long MobileNumber { get; set; }
         public string? HouseNumber { get; set; }
         public string? Area { get; set; }
         public string? Landmark { get; set; }

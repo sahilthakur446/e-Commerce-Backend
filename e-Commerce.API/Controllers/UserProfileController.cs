@@ -36,7 +36,7 @@ namespace e_Commerce.API.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
         }
 
-        [HttpGet("GetDefaultUserAddress")]
+        [HttpGet("GetDefaultUserAddress/{userId}")]
         public async Task<IActionResult> GetDefaultUserAddress(int? userId)
         {
             if (userId is null)
@@ -61,7 +61,7 @@ namespace e_Commerce.API.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
         }
 
-        [HttpGet("GetUserAllAddresses")]
+        [HttpGet("GetUserAllAddresses/{userId}")]
         public async Task<IActionResult> GetUserAllAddresses(int? userId)
         {
             if (userId is null)
