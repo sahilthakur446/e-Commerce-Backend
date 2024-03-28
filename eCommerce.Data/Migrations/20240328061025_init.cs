@@ -110,6 +110,27 @@ namespace eCommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserWishlists",
+                columns: table => new
+                {
+                    UserWishlistId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserWishlists", x => x.UserWishlistId);
+                    table.ForeignKey(
+                        name: "FK_UserWishlists_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Reviews",
                 columns: table => new
                 {
@@ -195,6 +216,11 @@ namespace eCommerce.Data.Migrations
                 name: "IX_Users_UserRoleId",
                 table: "Users",
                 column: "UserRoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserWishlists_ProductId",
+                table: "UserWishlists",
+                column: "ProductId");
         }
 
         /// <inheritdoc />
@@ -207,19 +233,22 @@ namespace eCommerce.Data.Migrations
                 name: "UserAddresses");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "UserWishlists");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "Brands");
 
             migrationBuilder.DropTable(
                 name: "Categories");
-
-            migrationBuilder.DropTable(
-                name: "UserRoles");
         }
     }
 }

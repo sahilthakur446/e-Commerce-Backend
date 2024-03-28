@@ -17,7 +17,7 @@ namespace eCommerce.Data.Models
         [Required]
         public string MobileNumber { get; set; }
         public string? HouseNumber { get; set; }
-        public string Area { get; set; }
+        public string? Area { get; set; }
         public string? Landmark { get; set; }
         [Required]
         public string City { get; set; }
@@ -26,8 +26,7 @@ namespace eCommerce.Data.Models
         [Required]
         public int Pincode { get; set; }
         public bool IsDefault { get; set; } = false;
-        [ForeignKey("UserAddress")]
+        [ForeignKey("User")]
         public int UserId { get; set; }
-        public User User { get; set; }
         }
     }

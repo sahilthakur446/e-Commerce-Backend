@@ -13,12 +13,19 @@ namespace eCommerce.Data.Mapper
         {
         public EntityDtoMapper()
         {
+            //ProductMapper
+
             CreateMap<Product, AddProductDTO>();
             CreateMap<Product, ProductInfoDTO>()
             .ForMember(dto => dto.BrandName, conf => conf.MapFrom(p => p.Brand.BrandName))
             .ForMember(dto => dto.CategoryName, conf => conf.MapFrom(p => p.Category.CategoryName));
             CreateMap<AddProductDTO, Product>();
 
+            //UserAddressMapper
+
+            CreateMap<AddUserAddressDTO, UserAddress>();
+            CreateMap<UserAddressDTO, UserAddress>();
+            CreateMap<UserAddress, UserAddressDTO>();
         }
     }
     }

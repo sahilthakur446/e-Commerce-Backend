@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace eCommerce.Data.Repository.Interface
     {
-    public interface IUserAddress
+    public interface IUserProfileRepository
         {
         Task<List<UserAddressDTO>> GetUsersAllAddress(int? userID);
         Task<UserAddressDTO> RetrieveDefaultUserAddress(int? userID);
-        Task<bool> SaveUserAddress(int? userId, UserAddressDTO userAddress);
+        Task<bool> SaveUserAddress(int? userId, AddUserAddressDTO userAddress);
         }
     }

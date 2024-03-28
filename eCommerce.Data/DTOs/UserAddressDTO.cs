@@ -9,12 +9,28 @@ namespace eCommerce.Data.DTOs
     {
     public class UserAddressDTO
         {
-        public int? UserAddressId { get; set; }
+        public string FullName { get; set; }
+
+        public string MobileNumber { get; set; }
+        public string? HouseNumber { get; set; }
+        public string? Area { get; set; }
+        public string? Landmark { get; set; }
+
+        public string City { get; set; }
+
+        public string State { get; set; }
+
+        public int Pincode { get; set; }
+        public bool IsDefault { get; set; } = false;
+        }
+    public class AddUserAddressDTO
+        {
+        [Required]
         public string FullName { get; set; }
         [Required]
         public string MobileNumber { get; set; }
         public string? HouseNumber { get; set; }
-        public string Area { get; set; }
+        public string? Area { get; set; }
         public string? Landmark { get; set; }
         [Required]
         public string City { get; set; }
@@ -23,5 +39,21 @@ namespace eCommerce.Data.DTOs
         [Required]
         public int Pincode { get; set; }
         public bool IsDefault { get; set; } = false;
+        }
+    public class UpdateUserAddressDTO
+        {
+        public string? FullName { get; set; }
+        
+        public string? MobileNumber { get; set; }
+        public string? HouseNumber { get; set; }
+        public string? Area { get; set; }
+        public string? Landmark { get; set; }
+       
+        public string? City { get; set; }
+       
+        public string? State { get; set; }
+       
+        public int? Pincode { get; set; }
+        public bool? IsDefault { get; set; } = false;
         }
     }

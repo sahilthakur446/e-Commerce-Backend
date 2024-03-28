@@ -73,7 +73,7 @@ namespace eCommerce.Data.Repository.Implementation
                 }
                 else
                 {
-                    userRoleId = context.UserRoles.FirstOrDefault(role => role.RoleName == "NormalUser").RoleId;
+                    userRoleId = context.UserRoles.FirstOrDefault(role => role.RoleName == "User").RoleId;
                 }
                 using var hmac = new HMACSHA512();
                 var newUser = new User
@@ -160,6 +160,26 @@ namespace eCommerce.Data.Repository.Implementation
             await context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> DeleteUser(int? userId)
+            {
+            var user = await context.Users.FindAsync(userId);
+            if (user is null)
+                {
+                throw new Exception("No user found for this id");
+                }
+            try
+                {
+                context.Users.Remove(user);
+                await context.SaveChangesAsync();
+                return true;
+                }
+            catch
+                {
+                throw new Exception("Failed to delete your account");
+                }
+            }
+
         public async Task<bool> CheckIfEmailExistsAsync(RegisterDTO user)
         {
             if (user != null)

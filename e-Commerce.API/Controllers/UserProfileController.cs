@@ -6,17 +6,17 @@ namespace e_Commerce.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserAddressController : Controller
+    public class UserProfileController : Controller
     {
-        private readonly IUserAddress userAddressRepo;
+        private readonly IUserProfileRepository userAddressRepo;
 
-        public UserAddressController(IUserAddress userAddressRepo)
+        public UserProfileController(IUserProfileRepository userAddressRepo)
         {
             this.userAddressRepo = userAddressRepo;
         }
 
         [HttpPost("SaveUserAddress/{userId}")]
-        public async Task<IActionResult> SaveUserAddress([FromForm] UserAddressDTO userAddress, int? userId)
+        public async Task<IActionResult> SaveUserAddress([FromBody] AddUserAddressDTO userAddress, int? userId)
         {
             if (userId is null)
             {

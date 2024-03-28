@@ -139,6 +139,33 @@ namespace e_Commerce.API.Controllers
         }
 
         [Authorize]
+        [HttpDelete("DeleteUser/{userId}")]
+        public async Task<IActionResult> DeleteUser(int? userId)
+            {
+            try
+                {
+                if (userId == null)
+                    {
+                    return BadRequest(new { Message = "User id cannot be null" });
+                    }
+
+                var result = await accountRepo.DeleteUser(userId.Value);
+                if (result)
+                    {
+                    return Ok(new { Message = "Account Deleted Successfully" });
+                    }
+                else
+                    {
+                    return StatusCode((int) HttpStatusCode.InternalServerError, "Failed to Delete User");
+                    }
+                }
+            catch (Exception ex)
+                {
+                return StatusCode((int) HttpStatusCode.InternalServerError, "Failed to Delete User");
+                }
+            }
+
+        [Authorize]
         [HttpPut("ChangePassword/{userId}")]
         public async Task<IActionResult> ChangePassword(int? userId, [FromBody] ChangePasswordDTO password)
         {
