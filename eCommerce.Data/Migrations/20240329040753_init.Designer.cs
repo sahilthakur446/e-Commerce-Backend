@@ -12,7 +12,7 @@ using eCommerce.Data.Data;
 namespace eCommerce.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240328154736_init")]
+    [Migration("20240329040753_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -210,9 +210,8 @@ namespace eCommerce.Data.Migrations
                     b.Property<string>("Landmark")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MobileNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long>("MobileNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Pincode")
                         .HasColumnType("int");

@@ -165,7 +165,7 @@ namespace eCommerce.Data.Migrations
                     UserAddressId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MobileNumber = table.Column<long>(type: "bigint", nullable: false),
                     HouseNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Area = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Landmark = table.Column<string>(type: "nvarchar(max)", nullable: true),

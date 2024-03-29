@@ -9,6 +9,7 @@ namespace eCommerce.Data.DTOs
     {
     public class UserAddressDTO
         {
+        public int UserAddressId { get; set; }
         public string FullName { get; set; }
 
         public long MobileNumber { get; set; }
