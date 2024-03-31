@@ -1,6 +1,7 @@
 ﻿using eCommerce.Data.DTOs;
 using eCommerce.Data.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace e_Commerce.API.Controllers
     {
@@ -8,11 +9,11 @@ namespace e_Commerce.API.Controllers
     [ApiController]
     public class UserProfileController : Controller
         {
-        private readonly IUserProfileRepository userAddressRepo;
+        private readonly IUserProfileRepository userProfileRepo;
 
-        public UserProfileController(IUserProfileRepository userAddressRepo)
+        public UserProfileController(IUserProfileRepository userProfileRepo)
             {
-            this.userAddressRepo = userAddressRepo;
+            this.userProfileRepo = userProfileRepo;
             }
 
         [HttpGet("GetAddress/{addressId}")]
@@ -25,7 +26,7 @@ namespace e_Commerce.API.Controllers
                     Message = "Invalid addressId"
                     });
                 }
-            var address = await userAddressRepo.GetUserAddress(addressId);
+            var address = await userProfileRepo.GetUserAddress(addressId);
             if (address is null)
                 {
                 return NotFound(new
@@ -50,7 +51,7 @@ namespace e_Commerce.API.Controllers
                     Message = "Invalid userId"
                     });
                 }
-            var address = await userAddressRepo.RetrieveDefaultUserAddress(userId);
+            var address = await userProfileRepo.RetrieveDefaultUserAddress(userId);
             if (address is null)
                 {
                 return NotFound(new
@@ -75,7 +76,7 @@ namespace e_Commerce.API.Controllers
                     Message = "Invalid userId"
                     });
                 }
-            var address = await userAddressRepo.GetUsersAllAddress(userId);
+            var address = await userProfileRepo.GetUsersAllAddress(userId);
 
             return Ok(address);
             }
@@ -90,7 +91,7 @@ namespace e_Commerce.API.Controllers
                     Message = "Invalid userId"
                     });
                 }
-            bool result = await userAddressRepo.SaveUserAddress(userId, userAddress);
+            bool result = await userProfileRepo.SaveUserAddress(userId, userAddress);
             if (result)
                 {
                 return Ok(new
@@ -111,7 +112,7 @@ namespace e_Commerce.API.Controllers
                     Message = "Invalid addressId"
                     });
                 }
-            bool result = await userAddressRepo.UpdateUserAddress(addressId, userAddress);
+            bool result = await userProfileRepo.UpdateUserAddress(addressId, userAddress);
             if (result)
                 {
                 return Ok(new
@@ -127,7 +128,7 @@ namespace e_Commerce.API.Controllers
             {
             try
                 {
-                bool result = await userAddressRepo.DeleteAddress(addressId);
+                bool result = await userProfileRepo.DeleteAddress(addressId);
                 if (result)
                     {
                     return Ok(new
@@ -147,6 +148,82 @@ namespace e_Commerce.API.Controllers
     
             }
 
+        [HttpPut("SetDefaultAddress/{addressId}")]
+        public async Task<IActionResult> SetDefaultAddress(int? addressId)
+        {
+            try
+            {
+                bool result = await userProfileRepo.SetDefaultAddress(addressId);
+                if (result)
+                {
+                    return Ok(new { Message = "Address Set to default successfully" });
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetUserAllWishlistProducts/{userId}")]
+        public async Task<IActionResult> GetUserAllWishlistProducts(int? userId)
+        {
+            try
+            {
+                var wishlistedItems = await userProfileRepo.GetUserAllWishlistProducts(userId);
+                return Ok(wishlistedItems);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("AddToWishlist/{userId}")]
+        public async Task<IActionResult> AddToWishlist([FromBody] AddUserWishlistDTO wishListItem, int? userId)
+        {
+            try
+            {
+                bool result = await userProfileRepo.AddToWishlist(userId, wishListItem);
+                if (result)
+                {
+                    return Ok(new
+                    {
+                        Message = "Added to wishlist"
+                    });
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("RemoveWishlistItem/{wishlistId}")]
+        public async Task<IActionResult> RemoveWishlistItem(int? wishlistId)
+        {
+            try
+            {
+                bool result = await userProfileRepo.DeleteWishlistItem(wishlistId);
+                if (result)
+                {
+                    return Ok(new
+                    {
+                        Message = "Removed Successfully"
+                    });
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    Message = ex.Message
+                }); ;
+            }
 
         }
     }
+}

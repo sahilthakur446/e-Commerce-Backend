@@ -110,6 +110,27 @@ namespace eCommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "userCarts",
+                columns: table => new
+                {
+                    UserCartId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_userCarts", x => x.UserCartId);
+                    table.ForeignKey(
+                        name: "FK_userCarts_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserWishlists",
                 columns: table => new
                 {
@@ -212,6 +233,11 @@ namespace eCommerce.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_userCarts_ProductId",
+                table: "userCarts",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_UserRoleId",
                 table: "Users",
                 column: "UserRoleId");
@@ -230,6 +256,9 @@ namespace eCommerce.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserAddresses");
+
+            migrationBuilder.DropTable(
+                name: "userCarts");
 
             migrationBuilder.DropTable(
                 name: "UserWishlists");

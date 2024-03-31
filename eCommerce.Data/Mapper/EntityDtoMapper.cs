@@ -26,6 +26,26 @@ namespace eCommerce.Data.Mapper
             CreateMap<AddUserAddressDTO, UserAddress>();
             CreateMap<UserAddressDTO, UserAddress>();
             CreateMap<UserAddress, UserAddressDTO>();
+
+            //UserWishlistMapper
+            CreateMap<UserWishlist, GetUserWishlistDTO>()
+           .ForMember(dto => dto.ProductName, conf => conf.MapFrom(p => p.Product.ProductName))
+           .ForMember(dto => dto.Price, conf => conf.MapFrom(p => p.Product.Price))
+           .ForMember(dto => dto.ImagePath, conf => conf.MapFrom(p => p.Product.ImagePath))
+           .ForMember(dto => dto.StockQuantity, conf => conf.MapFrom(p => p.Product.StockQuantity))
+           .ForMember(dto => dto.BrandName, conf => conf.MapFrom(p => p.Product.Brand.BrandName));
+
+            CreateMap<AddUserWishlistDTO, UserWishlist>();
+
+            //UserCartMapper
+            CreateMap<UserCart, GetUserCartDTO>()
+           .ForMember(dto => dto.ProductName, conf => conf.MapFrom(p => p.Product.ProductName))
+           .ForMember(dto => dto.Price, conf => conf.MapFrom(p => p.Product.Price))
+           .ForMember(dto => dto.ImagePath, conf => conf.MapFrom(p => p.Product.ImagePath))
+           .ForMember(dto => dto.StockQuantity, conf => conf.MapFrom(p => p.Product.StockQuantity))
+           .ForMember(dto => dto.BrandName, conf => conf.MapFrom(p => p.Product.Brand.BrandName));
+
+            CreateMap<AddUserCartDTO, UserCart>();
         }
     }
     }

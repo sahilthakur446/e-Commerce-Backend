@@ -8,9 +8,10 @@ namespace eCommerce.Data.Repository.Interface
         {
         Task<List<ProductInfoDTO>> GetAllProductsAsync();
         Task<ProductInfoDTO> GetProduct(int id);
-        Task<List<ProductInfoDTO>> GetProductsAbovePriceAsync(int minPrice);
-        Task<List<ProductInfoDTO>> GetProductsBelowPriceAsync(int maxPrice);
-        Task<List<ProductInfoDTO>> GetProductsWithinPriceRangeAsync(int minPrice, int maxPrice);
+        Task<List<ProductInfoDTO>> GetProductsAbovePriceAsync(int? minPrice);
+        Task<List<ProductInfoDTO>> GetProductsBelowPriceAsync(int? maxPrice);
+        Task<List<ProductInfoDTO>> GetProductsWithinPriceRangeAsync(int? minPrice, int? maxPrice);
+        Task<List<ProductInfoDTO>> GetProductsWithFiltersAsync(int? minPrice, int? maxPrice, int? category, int? brand, string? gender);
         Task<bool> AddProductAsync(AddProductDTO product);
         Task<bool> DeleteProductAsync(int? id);
         Task<bool> UpdateProductAsync(int id, UpdateProductDTO productDTO);

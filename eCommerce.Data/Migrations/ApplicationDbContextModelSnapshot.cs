@@ -227,6 +227,30 @@ namespace eCommerce.Data.Migrations
                     b.ToTable("UserAddresses");
                 });
 
+            modelBuilder.Entity("eCommerce.Data.Models.UserCart", b =>
+                {
+                    b.Property<int>("UserCartId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserCartId"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserCartId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("userCarts");
+                });
+
             modelBuilder.Entity("eCommerce.Data.Models.UserRole", b =>
                 {
                     b.Property<int>("RoleId")
@@ -321,6 +345,17 @@ namespace eCommerce.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("eCommerce.Data.Models.UserCart", b =>
+                {
+                    b.HasOne("eCommerce.Data.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("eCommerce.Data.Models.UserWishlist", b =>

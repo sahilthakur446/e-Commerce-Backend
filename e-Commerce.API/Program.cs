@@ -16,13 +16,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>
     (options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DBCSS")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DBCS")));
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<IUserCartRepository, UserCartRepository>();
 builder.Services.AddAutoMapper(typeof(EntityDtoMapper));
 //builder.Services.AddControllers().AddJsonOptions(options =>
 //{

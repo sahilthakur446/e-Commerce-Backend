@@ -49,7 +49,7 @@ namespace e_Commerce.API.Controllers
 
         [HttpGet("GetProductsAbovePrice/{minPrice}")]
 
-        public async Task<IActionResult> GetProductsAbovePriceRange(int minPrice)
+        public async Task<IActionResult> GetProductsAbovePriceRange(int? minPrice)
             {
             var products = await productRepository.GetProductsAbovePriceAsync(minPrice);
             if (products.Any())
@@ -60,7 +60,7 @@ namespace e_Commerce.API.Controllers
             }
         [HttpGet("GetProductsBelowPrice/{maxPrice}")]
 
-        public async Task<IActionResult> GetProductsBelowPriceRange(int maxPrice)
+        public async Task<IActionResult> GetProductsBelowPriceRange(int? maxPrice)
             {
             try {
                 var products = await productRepository.GetProductsBelowPriceAsync(maxPrice);
@@ -73,11 +73,9 @@ namespace e_Commerce.API.Controllers
             catch (Exception ex) { return BadRequest(ex.Message); }
             }
           
-
-
         [HttpGet("GetProductsWithinPriceRange/{minPrice}/{maxPrice}")]
 
-        public async Task<IActionResult> GetProductsWithinPriceRange(int minPrice, int maxPrice)
+        public async Task<IActionResult> GetProductsWithinPriceRange(int? minPrice, int? maxPrice)
             {
             try {
                 var products = await productRepository.GetProductsWithinPriceRangeAsync(minPrice, maxPrice);
@@ -92,6 +90,21 @@ namespace e_Commerce.API.Controllers
                 return BadRequest(ex.Message);
                 }
             }
+
+        [HttpGet("GetProductwithGivenFilter")]
+        public async Task<IActionResult> GetProductwithGivenFilter(int? minPrice, int? maxPrice, int? category, int? brand, string? gender)
+        {
+            try
+            {
+                var products = await productRepository.GetProductsWithFiltersAsync(minPrice,maxPrice,category,brand,gender);
+                if (products.Any())
+                {
+                    return Ok(products);
+                }
+                return NotFound();
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
 
         [HttpPost]
         [Route("AddProduct")]

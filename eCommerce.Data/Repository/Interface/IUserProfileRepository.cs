@@ -15,6 +15,10 @@ namespace eCommerce.Data.Repository.Interface
         Task<UserAddressDTO> RetrieveDefaultUserAddress(int? userID);
         Task<bool> SaveUserAddress(int? userId, AddUserAddressDTO userAddress);
         Task<bool> UpdateUserAddress(int? addressId, UpdateUserAddressDTO userAddress);
+        Task<bool> SetDefaultAddress(int? addressId);
         Task<bool> DeleteAddress(int? addressId);
-        }
+        Task<List<GetUserWishlistDTO>> GetUserAllWishlistProducts(int? userIdad);
+        Task<bool> AddToWishlist(int? userId, AddUserWishlistDTO wishlistedItem);
+        Task<bool> DeleteWishlistItem(int? wishlistId);
+    }
     }

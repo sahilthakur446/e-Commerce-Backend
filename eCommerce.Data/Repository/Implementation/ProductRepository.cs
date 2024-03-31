@@ -10,6 +10,7 @@ using static eCommerce.Utilities.GenderConverter;
 using AutoMapper;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Http.HttpResults;
+using eCommerce.Utilities;
 
 namespace eCommerce.Data.Repository.Implementation
 {
@@ -55,7 +56,7 @@ namespace eCommerce.Data.Repository.Implementation
             throw new Exception("No product Found");
         }
 
-        public async Task<List<ProductInfoDTO>> GetProductsAbovePriceAsync(int minPrice)
+        public async Task<List<ProductInfoDTO>> GetProductsAbovePriceAsync(int? minPrice)
             {
             var productList = await _dbContext.Products
                 .Include(p => p.Brand)
@@ -72,7 +73,7 @@ namespace eCommerce.Data.Repository.Implementation
             return productDTOsList;
             }
 
-        public async Task<List<ProductInfoDTO>> GetProductsBelowPriceAsync(int maxPrice)
+        public async Task<List<ProductInfoDTO>> GetProductsBelowPriceAsync(int? maxPrice)
             {
             var productList = await _dbContext.Products
                 .Include(p => p.Brand)
@@ -88,7 +89,7 @@ namespace eCommerce.Data.Repository.Implementation
             return productDTOsList;
         }
 
-        public async Task<List<ProductInfoDTO>> GetProductsWithinPriceRangeAsync(int minPrice, int maxPrice)
+        public async Task<List<ProductInfoDTO>> GetProductsWithinPriceRangeAsync(int? minPrice, int? maxPrice)
             {
             var productList = await _dbContext.Products
                 .Include(p => p.Brand)
@@ -104,7 +105,51 @@ namespace eCommerce.Data.Repository.Implementation
                 }
             return productDTOsList;
             }
-        
+
+        public async Task<List<ProductInfoDTO>> GetProductsWithFiltersAsync(int? minPrice, int? maxPrice, int? categoryId, int? brandId, string? gender)
+        {
+            var query = _dbContext.Products.AsQueryable();
+
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice);
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId);
+            }
+
+            if (brandId.HasValue)
+            {
+                query = query.Where(p => p.BrandId == brandId);
+            }
+
+            if (!string.IsNullOrEmpty(gender))
+            {
+                query = query.Where(p => p.TargetGender == GenderConverter.GetTargetGender(gender));
+            }
+
+            var productList = await query
+                .Include(p => p.Brand)
+                .Include(p => p.Category)
+                .ToListAsync();
+
+            var productDTOsList = mapper.Map<List<ProductInfoDTO>>(productList);
+
+            if (!productDTOsList.Any())
+            {
+                throw new Exception("No Product Found");
+            }
+
+            return productDTOsList;
+        }
+
         private async Task<string> SaveImageAsync(int? categoryId, IFormFile imageFile)
         {
             try
@@ -238,7 +283,5 @@ namespace eCommerce.Data.Repository.Implementation
             }
             return false;
         }
-
-
     }
 }

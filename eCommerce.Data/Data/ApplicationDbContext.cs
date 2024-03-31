@@ -19,6 +19,7 @@ namespace eCommerce.Data.Data
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<UserAddress> UserAddresses { get; set; }
         public DbSet<UserWishlist> UserWishlists { get; set; }
+        public DbSet<UserCart> UserCarts { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Brand> Brands { get; set; }

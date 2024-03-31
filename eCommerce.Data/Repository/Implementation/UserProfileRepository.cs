@@ -112,6 +112,89 @@ namespace eCommerce.Data.Repository.Implementation
              await context.SaveChangesAsync();
              return true;
         }
-            
+
+        public async Task<bool> SetDefaultAddress(int? addressId)
+        {
+            if (addressId is null)
+            {
+                throw new Exception("addressId is null");
+            }
+            var userAddress = await context.UserAddresses.FindAsync(addressId);
+            if (userAddress is null)
+            {
+                throw new Exception("No address found for specified Id");
+            }
+            var defaultAddress = await context.UserAddresses.FirstOrDefaultAsync(a => a.IsDefault == true);
+            if (defaultAddress is null)
+            {
+                userAddress.IsDefault = true;
+                await context.SaveChangesAsync();
+                return true;
+            }
+            defaultAddress.IsDefault = false;
+            userAddress.IsDefault = true;
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<GetUserWishlistDTO>> GetUserAllWishlistProducts(int? userId)
+        {
+            if (userId is null)
+            {
+                throw new Exception("User Id cannot be null");
+            }
+            var wishlistItems = await context.UserWishlists
+                .Where(w => w.UserId == userId)
+                .Include(uw => uw.Product)
+                .ThenInclude(p => p.Brand)
+                .ToListAsync();
+
+            var wishlistItemsDto = mapper.Map<List<GetUserWishlistDTO>>(wishlistItems);
+            return wishlistItemsDto;
+        }
+
+        public async Task<bool> AddToWishlist(int? userId, AddUserWishlistDTO wishlistedItem)
+        {
+            try
+            {
+                if (userId is null)
+                {
+                    throw new Exception("User Id cannot be null");
+                }
+
+                if (await context.UserWishlists.FirstOrDefaultAsync(w => w.ProductId == wishlistedItem.ProductId && w.UserId == userId) != null)
+                {
+                    throw new Exception("Already in the wishlist");
+                }
+
+                var wishlistItem = mapper.Map<UserWishlist>(wishlistedItem);
+                await context.AddAsync(wishlistItem);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> DeleteWishlistItem(int? wishlistId)
+        {
+            try
+            {
+                if (wishlistId is null)
+                {
+                    throw new Exception("Wishlist Id cannot be null");
+                }
+                var wishlistItem = await context.UserWishlists.FirstOrDefaultAsync(w => w.UserWishlistId == wishlistId);
+                context.UserWishlists.Remove(wishlistItem);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Some Internal Server Error Occurred");
+            }
+        }
     }
     }
