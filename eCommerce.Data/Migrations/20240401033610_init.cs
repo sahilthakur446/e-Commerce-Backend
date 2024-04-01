@@ -110,7 +110,7 @@ namespace eCommerce.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "userCarts",
+                name: "UserCarts",
                 columns: table => new
                 {
                     UserCartId = table.Column<int>(type: "int", nullable: false)
@@ -121,9 +121,9 @@ namespace eCommerce.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_userCarts", x => x.UserCartId);
+                    table.PrimaryKey("PK_UserCarts", x => x.UserCartId);
                     table.ForeignKey(
-                        name: "FK_userCarts_Products_ProductId",
+                        name: "FK_UserCarts_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
@@ -233,8 +233,8 @@ namespace eCommerce.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_userCarts_ProductId",
-                table: "userCarts",
+                name: "IX_UserCarts_ProductId",
+                table: "UserCarts",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -258,7 +258,7 @@ namespace eCommerce.Data.Migrations
                 name: "UserAddresses");
 
             migrationBuilder.DropTable(
-                name: "userCarts");
+                name: "UserCarts");
 
             migrationBuilder.DropTable(
                 name: "UserWishlists");

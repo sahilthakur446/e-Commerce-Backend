@@ -106,7 +106,7 @@ namespace eCommerce.Data.Repository.Implementation
             return productDTOsList;
             }
 
-        public async Task<List<ProductInfoDTO>> GetProductsWithFiltersAsync(int? minPrice, int? maxPrice, int? categoryId, int? brandId, string? gender)
+        public async Task<List<ProductInfoDTO>> GetProductsWithFiltersAsync(int? minPrice, int? maxPrice, int? categoryId, int? brandId, string? gender,bool isNew)
         {
             var query = _dbContext.Products.AsQueryable();
 
@@ -135,17 +135,17 @@ namespace eCommerce.Data.Repository.Implementation
                 query = query.Where(p => p.TargetGender == GenderConverter.GetTargetGender(gender));
             }
 
+            if (isNew)
+            {
+                query = query.OrderByDescending(p => p.DateAdded);
+            }
+
             var productList = await query
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
                 .ToListAsync();
 
             var productDTOsList = mapper.Map<List<ProductInfoDTO>>(productList);
-
-            if (!productDTOsList.Any())
-            {
-                throw new Exception("No Product Found");
-            }
 
             return productDTOsList;
         }

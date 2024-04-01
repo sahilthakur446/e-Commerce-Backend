@@ -248,7 +248,7 @@ namespace eCommerce.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("userCarts");
+                    b.ToTable("UserCarts");
                 });
 
             modelBuilder.Entity("eCommerce.Data.Models.UserRole", b =>

@@ -12,7 +12,7 @@ using eCommerce.Data.Data;
 namespace eCommerce.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240330062056_init")]
+    [Migration("20240401033610_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -251,7 +251,7 @@ namespace eCommerce.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("userCarts");
+                    b.ToTable("UserCarts");
                 });
 
             modelBuilder.Entity("eCommerce.Data.Models.UserRole", b =>
