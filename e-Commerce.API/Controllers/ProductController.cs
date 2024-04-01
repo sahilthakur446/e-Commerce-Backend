@@ -92,11 +92,11 @@ namespace e_Commerce.API.Controllers
             }
 
         [HttpGet("GetProductwithGivenFilter")]
-        public async Task<IActionResult> GetProductwithGivenFilter(int? minPrice, int? maxPrice, int? category, int? brand, string? gender, bool isNew)
+        public async Task<IActionResult> GetProductwithGivenFilter(int? minPrice, int? maxPrice, string? category, int? categoryId, int? brandId, string? gender, bool isNew)
         {
             try
             {
-                var products = await productRepository.GetProductsWithFiltersAsync(minPrice,maxPrice,category,brand,gender,isNew);
+                var products = await productRepository.GetProductsWithFiltersAsync(minPrice,maxPrice,category, categoryId, brandId, gender,isNew);
                 return Ok(products); 
             }
             catch (Exception ex) 

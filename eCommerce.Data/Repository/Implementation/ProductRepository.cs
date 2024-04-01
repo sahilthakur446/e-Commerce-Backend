@@ -106,7 +106,7 @@ namespace eCommerce.Data.Repository.Implementation
             return productDTOsList;
             }
 
-        public async Task<List<ProductInfoDTO>> GetProductsWithFiltersAsync(int? minPrice, int? maxPrice, int? categoryId, int? brandId, string? gender,bool isNew)
+        public async Task<List<ProductInfoDTO>> GetProductsWithFiltersAsync(int? minPrice, int? maxPrice, string? category, int? categoryId, int? brandId, string? gender,bool isNew)
         {
             var query = _dbContext.Products.AsQueryable();
 
@@ -138,6 +138,11 @@ namespace eCommerce.Data.Repository.Implementation
             if (isNew)
             {
                 query = query.OrderByDescending(p => p.DateAdded);
+            }
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                query = query.Where(p => p.Category.CategoryName.ToLower() == category.ToLower());
             }
 
             var productList = await query
