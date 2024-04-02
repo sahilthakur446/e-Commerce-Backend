@@ -31,6 +31,17 @@ namespace eCommerce.Data.Repository.Implementation
                 {
                     throw new Exception("User Id can not be null");
                 }
+                var alreadyProduct = await context.UserCarts.FirstOrDefaultAsync(u => u.ProductId == product.ProductId && u.UserId == userId);
+                if (alreadyProduct != null) 
+                    {
+                    if (alreadyProduct.Quantity == 5)
+                    {
+                        throw new Exception("Can not add more than 5 ");
+                    }
+                    alreadyProduct.Quantity += 1;
+                    await context.SaveChangesAsync();
+                    return true;
+                    }
                 var cartProduct = mapper.Map<UserCart>(product);
                 await context.UserCarts.AddAsync(cartProduct);
                 await context.SaveChangesAsync();
@@ -41,6 +52,28 @@ namespace eCommerce.Data.Repository.Implementation
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<int> GetUserCartCount(int? userId)
+            {
+            try
+                {
+                int count = 0;
+                if (userId is null)
+                    {
+                    throw new Exception("User Id can not be null");
+                    }
+                var userCartList = await context.UserCarts.Where(u => u.UserId == userId).ToListAsync();
+                foreach (var userCart in userCartList) 
+                    {
+                    count +=  userCart.Quantity;
+                    }
+                return count;
+                }
+            catch (Exception ex)
+                {
+                throw new Exception(ex.Message);
+                }
+            }
 
         public async Task<List<GetUserCartDTO>> GetUserCartProducts(int? userId)
         {

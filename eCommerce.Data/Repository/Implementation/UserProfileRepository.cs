@@ -39,6 +39,15 @@ namespace eCommerce.Data.Repository.Implementation
                 }
             var newUserAddress = mapper.Map<UserAddress>(userAddress);
             newUserAddress.UserId = (int)userId;
+            if (newUserAddress.IsDefault == true)
+            {
+                var existingDefaultAddress = await context.UserAddresses
+                    .FirstOrDefaultAsync(a => a.IsDefault == true &&  a.UserId == userId);
+                if (existingDefaultAddress is not null)
+                    {
+                    existingDefaultAddress.IsDefault = false;
+                    }
+            }
             await context.UserAddresses.AddAsync(newUserAddress);
             await context.SaveChangesAsync();
             return true;
@@ -50,6 +59,7 @@ namespace eCommerce.Data.Repository.Implementation
                 {
                 throw new Exception("addressId can not be null");
                 }
+
             var address = await context.UserAddresses.FindAsync(addressId);
             if (address is null)
                 {

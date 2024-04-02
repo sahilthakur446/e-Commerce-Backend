@@ -30,6 +30,20 @@ namespace e_Commerce.API.Controllers
             }
         }
 
+        [HttpGet("GetUserCartCount/{userId}")]
+        public async Task<IActionResult> GetUserCartCount(int? userId)
+            {
+            try
+                {
+                var cartCount = await userCartRepository.GetUserCartCount(userId);
+                return Ok(cartCount);
+                }
+            catch (Exception ex)
+                {
+                return BadRequest(ex.Message);
+                }
+            }
+
         [HttpPost("AddProductInCart/{userId}")]
         public async Task<IActionResult> AddProductInCart(int? userId,AddUserCartDTO cartItem)
         {
