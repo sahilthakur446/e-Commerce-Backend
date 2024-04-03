@@ -4,6 +4,7 @@ using eCommerce.Data.DTOs;
 using eCommerce.Data.Models;
 using eCommerce.Data.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
+using Razorpay.Api;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -150,7 +151,6 @@ namespace eCommerce.Data.Repository.Implementation
                 throw new Exception("Some error occured");
             }
         }
-
     }
 }
 
