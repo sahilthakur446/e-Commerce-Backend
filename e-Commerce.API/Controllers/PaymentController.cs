@@ -1,6 +1,8 @@
 ﻿using eCommerce.Data.DTOs;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Razorpay.Api;
 
 namespace e_Commerce.API.Controllers
@@ -22,6 +24,7 @@ namespace e_Commerce.API.Controllers
             Dictionary<string, object> input = new Dictionary<string, object>();
             input.Add("amount", amount);
             input.Add("currency", "INR");
+            input.Add("payment_capture", true);
 
             var paymentSettings = configuration.GetSection("PaymentSettings");
             string key = paymentSettings["SecretKey"];
@@ -43,33 +46,20 @@ namespace e_Commerce.API.Controllers
                 }
             }
 
-        [HttpPost("confirm")]
-        public IActionResult ConfirmPayment([FromBody] ConfirmPaymentPayload data)
+        [HttpGet("confirm")]
+        public IActionResult ConfirmPayment(string paymentId)
         {
-            Dictionary<string, object> input = new Dictionary<string, object>();
-            input.Add("amount", 100); // this amount should be same as transaction amount
-            input.Add("currency", "INR");
-
             var paymentSettings = configuration.GetSection("PaymentSettings");
             string key = paymentSettings["SecretKey"];
             string secret = paymentSettings["Secret"];
-
-            try
-            {
-                RazorpayClient client = new RazorpayClient(key, secret);
-                Razorpay.Api.Order order = client.Order.Create(input);
-                string orderId = order["id"].ToString();
-
-                // Assuming you want to return the order ID to the client
-                return Ok(new { orderId = orderId });
+            RazorpayClient client = new RazorpayClient(key, secret);
+            var payment = client.Payment.Fetch(paymentId);
+            Dictionary<string,object> options = new Dictionary<string, object>();
+            options.Add("amount", payment.Attributes["amount"]);
+            Razorpay.Api.Payment paymentCaptured = payment.Capture(options);
+            var status = paymentCaptured.Attributes["status"].ToString();
+            return Ok(new { paymentstatus = status });
             }
-            catch (Exception ex)
-            {
-                // Handle the exception (log it, return error response, etc.)
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while creating the order");
-            }
-        }
-
 
     }
 }
