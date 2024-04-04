@@ -8,37 +8,36 @@ using System.Threading.Tasks;
 
 namespace eCommerce.Data.DTOs
     {
-    public class GetUserOrderDTO
-        {
+    public class OrderDetailsDTO
+    {
         public int UserOrderId { get; set; }
-        public int UserId { get; set; }
-        public List<UserOrderItem> UserOrderItems { get; set; }
         public string PaymentId { get; set; }
-        public decimal TotalAmount { get; set; }
+        public int TotalAmount { get; set; }
+
         public int UserAddressId { get; set; }
-        public string OrderDate { get; set; }
+        public DateTime OrderDate { get; set; }
         public string Status { get; set; }
-        }
+        public List<OrderItemDetailsDTO> OrderItems { get; set; }
+    }
+
+    public class OrderItemDetailsDTO
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public int Quantity { get; set; }
+        public int Price { get; set; }
+        public string ImagePath { get; set; }
+    }
+
 
     public class AddUserOrderDTO
         {
         public int UserId { get; set; }
         public List<GetUserCartDTO> UserCartItems { get; set; }
         public string PaymentId { get; set; }
-        public decimal TotalAmount { get; set; }
+        public int TotalAmount { get; set; }
         public int UserAddressId { get; set; }
 
         }
 
-    public class GetUserOrderProductsDTO
-        {
-        public int UserOrderId { get; set; }
-        public int Quantity { get; set; }
-        public int ProductId { get; set; }
-        public string ProductName { get; set; }
-        public int Price { get; set; }
-        public string ImagePath { get; set; }
-        public string BrandName { get; set; }
-        public int UserId { get; set; }
-        }
     }

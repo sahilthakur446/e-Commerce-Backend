@@ -21,11 +21,10 @@ namespace eCommerce.Data.Models
         public User User { get; set; }
         public List<UserOrderItem> UserOrderItems { get; set; }
         public string PaymentId { get; set; }
-        public decimal TotalAmount { get; set; }
+        public int TotalAmount { get; set; }
 
         [ForeignKey("UserAddress")]
         public int UserAddressId { get; set; }
-        public UserAddress UserAddress { get; set; }
         public DateTime OrderDate { get; set; }
         public string Status { get; set; }
         }

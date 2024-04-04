@@ -1,4 +1,5 @@
-﻿using eCommerce.Data.Data;
+﻿using AutoMapper;
+using eCommerce.Data.Data;
 using eCommerce.Data.DTOs;
 using eCommerce.Data.Models;
 using eCommerce.Data.Repository.Interface;
@@ -12,92 +13,80 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace eCommerce.Data.Repository.Implementation
-    {
+{
     public class UserOrderRepository : IUserOrderRepository
-        {
+    {
         private readonly ApplicationDbContext context;
+        private readonly IMapper mapper;
 
-        public UserOrderRepository(ApplicationDbContext context)
-            {
+        public UserOrderRepository(ApplicationDbContext context, IMapper mapper)
+        {
             this.context = context;
-            }
+            this.mapper = mapper;
+        }
 
-        public async Task<List<GetUserOrderProductsDTO>> GetUserOrderAsync(int? userId)
-            {
+        public async Task<List<OrderDetailsDTO>> GetUserOrderAsync(int? userId)
+        {
             var userOrders = await context.UserOrders
-                                  .Include(o => o.UserOrderItems)
-                                  .ThenInclude(p => p.Product)
-                                  .Include(o => o.UserOrderItems) 
-                                  .ThenInclude(p => p.Product.Brand) 
-                                  .Include(o => o.UserOrderItems) 
-                                  .ThenInclude(p => p.Product.Category)
-                                  .Where(o => o.UserId == userId)
-                                  .ToListAsync();
+                .Include(o => o.UserOrderItems)
+                .ThenInclude(p => p.Product)
+                .Where(o => o.UserId == userId && (o.Status == "Pending" || o.Status == "Shipped"))
+                .ToListAsync();
 
-            var userOrderItems = new List<UserOrderItem>();
-            foreach (var item in userOrders)
-                {
-                userOrderItems.AddRange(item.UserOrderItems);
-                }
+            var ordersDetailsList = new List<OrderDetailsDTO>();
 
-            var userOrderProducts = new List<GetUserOrderProductsDTO>();
-            foreach (var item in userOrderItems)
-                {
-                var product = new GetUserOrderProductsDTO
-                    {
-                    UserOrderId = item.UserOrderId,
-                    Quantity = item.Quantity,
-                    ProductId = item.ProductId,
-                    ProductName = item.Product.ProductName,
-                    Price = item.Product.Price,
-                    ImagePath = item.Product.ImagePath,
-                    BrandName = item.Product.Brand.BrandName,
-                    UserId = (int) userId
-                    };
-                userOrderProducts.Add(product);
-                }
+            foreach (var order in userOrders)
+            {
+                var orderDetailsDto = mapper.Map<OrderDetailsDTO>(order);
+                orderDetailsDto.OrderItems = order.UserOrderItems
+                    .Select(item => mapper.Map<OrderItemDetailsDTO>(item))
+                    .ToList();
 
-            return userOrderProducts;
+                ordersDetailsList.Add(orderDetailsDto);
             }
+
+            return ordersDetailsList;
+        }
+
 
         public async Task<bool> AddUserOrderAsync(int userId, AddUserOrderDTO userOrderDetails)
-            {
+        {
             using (var transaction = context.Database.BeginTransaction())
-                {
+            {
                 try
-                    {
+                {
                     var newUserOrder = new UserOrder
-                        {
+                    {
                         UserId = userId,
                         PaymentId = userOrderDetails.PaymentId,
                         TotalAmount = userOrderDetails.TotalAmount,
                         UserAddressId = userOrderDetails.UserAddressId,
                         OrderDate = DateTime.Now,
                         Status = "Pending"
-                        };
+                    };
                     await context.UserOrders.AddAsync(newUserOrder);
                     await context.SaveChangesAsync();
                     foreach (var item in userOrderDetails.UserCartItems)
-                        {
+                    {
                         var userOrderItem = new UserOrderItem
-                            {
+                        {
                             UserOrderId = newUserOrder.UserOrderId,
                             ProductId = item.ProductId,
                             Quantity = item.Quantity,
                             Price = item.Price
-                            };
+                        };
                         await context.AddAsync(userOrderItem);
-                        }
+                    }
                     await context.SaveChangesAsync();
                     await transaction.CommitAsync();
                     return true;
-                    }
+                }
                 catch (DbUpdateException ex)
-                    {
+                {
                     await transaction.RollbackAsync();
                     throw new Exception(ex.Message);
-                    }
                 }
             }
         }
     }
+}

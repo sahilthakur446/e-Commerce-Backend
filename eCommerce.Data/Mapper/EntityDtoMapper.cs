@@ -46,6 +46,11 @@ namespace eCommerce.Data.Mapper
            .ForMember(dto => dto.BrandName, conf => conf.MapFrom(p => p.Product.Brand.BrandName));
 
             CreateMap<AddUserCartDTO, UserCart>();
+
+            //UserOrderMapper
+            CreateMap<UserOrderItem, OrderItemDetailsDTO>()
+            .ForMember(dto => dto.ProductName, conf => conf.MapFrom(p => p.Product.ProductName));
+            CreateMap<UserOrder, OrderDetailsDTO>();
         }
     }
     }

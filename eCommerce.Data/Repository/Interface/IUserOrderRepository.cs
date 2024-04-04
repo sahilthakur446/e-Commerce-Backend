@@ -11,7 +11,7 @@ namespace eCommerce.Data.Repository.Interface
     {
     public interface IUserOrderRepository
         {
-        Task<List<GetUserOrderProductsDTO>> GetUserOrderAsync(int? userId);
+        Task<List<OrderDetailsDTO>> GetUserOrderAsync(int? userId);
         Task<bool> AddUserOrderAsync(int userId, AddUserOrderDTO userOrderDetails);
         }
     }

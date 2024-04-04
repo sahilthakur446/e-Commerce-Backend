@@ -29,20 +29,19 @@ namespace eCommerce.Data.Repository.Implementation
 
         public async Task<List<ProductInfoDTO>> GetAllProductsAsync()
         {
-            
+            try
+            {
                 var products = await _dbContext.Products
                     .Include(product => product.Brand)
                     .Include(product => product.Category)
                     .ToListAsync();
-            if (!products.Any())
-            {
-                throw new Exception("No Product Found");
-            }
-            var productDtos = mapper.Map<List<ProductInfoDTO>>(products);
-                
+                var productDtos = mapper.Map<List<ProductInfoDTO>>(products);
                 return productDtos;
-            
-           
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Some Error Occured");
+            }
         }
 
         public async Task<ProductInfoDTO> GetProduct(int id)

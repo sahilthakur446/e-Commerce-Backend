@@ -12,8 +12,8 @@ using eCommerce.Data.Data;
 namespace eCommerce.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240404102348_addUserOrderTable")]
-    partial class addUserOrderTable
+    [Migration("20240404163143_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -273,8 +273,8 @@ namespace eCommerce.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalAmount")
+                        .HasColumnType("int");
 
                     b.Property<int>("UserAddressId")
                         .HasColumnType("int");
@@ -283,8 +283,6 @@ namespace eCommerce.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("UserOrderId");
-
-                    b.HasIndex("UserAddressId");
 
                     b.HasIndex("UserId");
 
@@ -299,8 +297,8 @@ namespace eCommerce.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserOrderItemId"));
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -429,12 +427,6 @@ namespace eCommerce.Data.Migrations
 
             modelBuilder.Entity("eCommerce.Data.Models.UserOrder", b =>
                 {
-                    b.HasOne("eCommerce.Data.Models.UserAddress", "UserAddress")
-                        .WithMany()
-                        .HasForeignKey("UserAddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("eCommerce.Data.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -442,8 +434,6 @@ namespace eCommerce.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-
-                    b.Navigation("UserAddress");
                 });
 
             modelBuilder.Entity("eCommerce.Data.Models.UserOrderItem", b =>
