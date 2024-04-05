@@ -49,8 +49,11 @@ namespace eCommerce.Data.Mapper
 
             //UserOrderMapper
             CreateMap<UserOrderItem, OrderItemDetailsDTO>()
-            .ForMember(dto => dto.ProductName, conf => conf.MapFrom(p => p.Product.ProductName));
+            .ForMember(dto => dto.ProductName, conf => conf.MapFrom(p => p.Product.ProductName))
+            .ForMember(dto => dto.ImagePath, conf => conf.MapFrom(p => p.Product.ImagePath))
+            .ForMember(dto => dto.BrandName, conf => conf.MapFrom(p => p.Product.Brand.BrandName));
             CreateMap<UserOrder, OrderDetailsDTO>();
+            CreateMap<UserOrder, AdminOrderDetailsDTO>();
         }
     }
     }

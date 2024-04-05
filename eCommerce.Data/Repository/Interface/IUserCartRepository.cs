@@ -13,6 +13,7 @@ namespace eCommerce.Data.Repository.Interface
         Task<bool> AddProductInCart(int? userId, AddUserCartDTO cartItem);
         Task<bool> UpdateProductQuantityInCart(int? userCartId, UpdateUserCartDTO updatedCart);
         Task<bool> RemoveProductFromCart(int? userCartId);
+        Task<bool> RemoveCart(int? userId);
         Task<int> GetUserCartCount(int? userId);
     }
 }

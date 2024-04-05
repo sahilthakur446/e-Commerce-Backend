@@ -5,6 +5,8 @@ using eCommerce.Data.Models;
 using eCommerce.Data.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Razorpay.Api;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -18,18 +20,21 @@ namespace eCommerce.Data.Repository.Implementation
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
+        private readonly IConfiguration configuration;
 
-        public UserOrderRepository(ApplicationDbContext context, IMapper mapper)
+        public UserOrderRepository(ApplicationDbContext context, IMapper mapper, IConfiguration configuration)
         {
             this.context = context;
             this.mapper = mapper;
-        }
+            this.configuration = configuration;
+            }
 
         public async Task<List<OrderDetailsDTO>> GetUserOrderAsync(int? userId)
         {
             var userOrders = await context.UserOrders
                 .Include(o => o.UserOrderItems)
                 .ThenInclude(p => p.Product)
+                .ThenInclude(p => p.Brand)
                 .Where(o => o.UserId == userId && (o.Status == "Pending" || o.Status == "Shipped"))
                 .ToListAsync();
 
@@ -48,6 +53,59 @@ namespace eCommerce.Data.Repository.Implementation
             return ordersDetailsList;
         }
 
+        public async Task<List<AdminOrderDetailsDTO>> GetUserOrderListWihtPaymentStatusAsync()
+            {
+            var userOrders = await context.UserOrders
+                .Include(o => o.UserOrderItems)
+                .ThenInclude(p => p.Product)
+                .ThenInclude(p => p.Brand)
+                .ToListAsync();
+
+            var ordersDetailsList = new List<AdminOrderDetailsDTO>();
+
+            foreach (var order in userOrders)
+                {
+                var orderDetailsDto = mapper.Map<AdminOrderDetailsDTO>(order);
+                orderDetailsDto.PaymentStatus = GetPaymentStatus(orderDetailsDto.PaymentId);
+                orderDetailsDto.OrderItems = order.UserOrderItems
+                    .Select(item => mapper.Map<OrderItemDetailsDTO>(item))
+                    .ToList();
+
+                ordersDetailsList.Add(orderDetailsDto);
+                }
+
+            return ordersDetailsList;
+            }
+
+        private string GetPaymentStatus(string paymentId)
+            {
+            var paymentSettings = configuration.GetSection("PaymentSettings");
+            string key = paymentSettings["SecretKey"];
+            string secret = paymentSettings["Secret"];
+            RazorpayClient client = new RazorpayClient(key, secret);
+            var payment = client.Payment.Fetch(paymentId);
+            var status = payment.Attributes["status"].ToString();
+            return status;
+            }
+
+        public async Task<bool> ChangeOrderStatus(int orderId, string orderStatus)
+            {
+            try
+                {
+                var order = await context.UserOrders.FindAsync(orderId);
+                if (order is null)
+                {
+                    throw new Exception("No order Found");
+                }
+                order.Status = orderStatus;
+                await context.SaveChangesAsync();
+                return true;
+                }
+            catch (Exception ex)
+                {
+                throw new Exception(ex.Message);
+                }
+            }
 
         public async Task<bool> AddUserOrderAsync(int userId, AddUserOrderDTO userOrderDetails)
         {
@@ -77,8 +135,8 @@ namespace eCommerce.Data.Repository.Implementation
                         };
                         await context.AddAsync(userOrderItem);
                     }
-                    await context.SaveChangesAsync();
                     await transaction.CommitAsync();
+                    await context.SaveChangesAsync();
                     return true;
                 }
                 catch (DbUpdateException ex)

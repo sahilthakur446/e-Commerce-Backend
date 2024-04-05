@@ -97,5 +97,23 @@ namespace e_Commerce.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-    }
+
+        [HttpDelete("RemoveUserCart/{userCartId}")]
+        public async Task<IActionResult> RemoveUserCart(int? userCartId)
+            {
+            try
+                {
+                var result = await userCartRepository.RemoveCart(userCartId);
+                if (result)
+                    {
+                    return Ok(new { Message = "Cart removed successfuly" });
+                    }
+                return BadRequest(new { Message = "Failed to remove product" });
+                }
+            catch (Exception ex)
+                {
+                return BadRequest(ex.Message);
+                }
+            }
+        }
 }

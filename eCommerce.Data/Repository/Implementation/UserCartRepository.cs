@@ -124,6 +124,27 @@ namespace eCommerce.Data.Repository.Implementation
             }
         }
 
+        public async Task<bool> RemoveCart(int? userId)
+            {
+            using (var transaction = await context.Database.BeginTransactionAsync())
+                try
+                    {
+                    if (userId is null)
+                        {
+                        throw new Exception("UserCart Id can not be null");
+                        }
+                    var userCart = await context.UserCarts.Where(c => c.UserId == userId).ToListAsync();
+                    context.UserCarts.RemoveRange(userCart);
+                    await transaction.CommitAsync();
+                    await context.SaveChangesAsync();
+                    return true;
+                    }
+                catch(DbUpdateException ex)
+                    {
+                    await transaction.RollbackAsync();
+                    throw new Exception("Some error occured");
+                    }
+            }
         public async Task<bool> UpdateProductQuantityInCart(int? userCartId, UpdateUserCartDTO updatedCart)
         {
             try

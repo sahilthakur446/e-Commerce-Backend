@@ -25,6 +25,13 @@ namespace e_Commerce.API.Controllers
             return Ok(userOrders);
             }
 
+        [HttpGet("GetUserOrderListWihtPaymentStatusAsync")]
+        public async Task<IActionResult> GetUserOrderListWihtPaymentStatusAsync()
+            {
+            var userOrdersList = await userOrderRepo.GetUserOrderListWihtPaymentStatusAsync();
+            return Ok(userOrdersList);
+            }
+
 
         [HttpPost("AddUserOrder/{userId}")]
         public async Task<IActionResult> AddUserOrder(int userId, [FromBody] AddUserOrderDTO userOrderDetails)
@@ -44,5 +51,22 @@ namespace e_Commerce.API.Controllers
                 }
             }
 
+        [HttpPost("ChangeOrderStatus/{orderId}")]
+        public async Task<IActionResult> ChangeOrderStatus(int orderId, string orderStatus)
+            {
+            try
+                {
+                bool result = await this.userOrderRepo.ChangeOrderStatus(orderId, orderStatus);
+                if (result)
+                    {
+                    return Ok(new { Message = "Order Status Changed Successfully" });
+                    }
+                return BadRequest();
+                }
+            catch (Exception ex)
+                {
+                throw new Exception(ex.Message);
+                }
+            }
         }
     }
