@@ -33,7 +33,6 @@ namespace e_Commerce.API.Controllers
                 Razorpay.Api.Order order = client.Order.Create(input);
                 string orderId = order["id"].ToString();
 
-                // Assuming you want to return the order ID to the client
                 return Ok(new { orderId = orderId });
                 }
             catch (Exception ex)

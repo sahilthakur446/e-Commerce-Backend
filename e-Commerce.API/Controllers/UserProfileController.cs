@@ -1,5 +1,6 @@
 ﻿using eCommerce.Data.DTOs;
 using eCommerce.Data.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -16,6 +17,7 @@ namespace e_Commerce.API.Controllers
             this.userProfileRepo = userProfileRepo;
             }
 
+        [Authorize]
         [HttpGet("GetAddress/{addressId}")]
         public async Task<IActionResult> GetAddress(int? addressId)
             {
@@ -41,6 +43,7 @@ namespace e_Commerce.API.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
 
+        [Authorize]
         [HttpGet("GetDefaultUserAddress/{userId}")]
         public async Task<IActionResult> GetDefaultUserAddress(int? userId)
             {
@@ -66,6 +69,7 @@ namespace e_Commerce.API.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
 
+        [Authorize]
         [HttpGet("GetUserAllAddresses/{userId}")]
         public async Task<IActionResult> GetUserAllAddresses(int? userId)
             {
@@ -81,6 +85,7 @@ namespace e_Commerce.API.Controllers
             return Ok(address);
             }
 
+        [Authorize]
         [HttpPost("SaveUserAddress/{userId}")]
         public async Task<IActionResult> SaveUserAddress([FromBody] AddUserAddressDTO userAddress, int? userId)
             {
@@ -102,6 +107,7 @@ namespace e_Commerce.API.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
 
+        [Authorize]
         [HttpPut("UpdateUserAddress/{addressId}")]
         public async Task<IActionResult> UpdateUserAddress([FromBody] UpdateUserAddressDTO userAddress, int? addressId)
             {
@@ -123,6 +129,7 @@ namespace e_Commerce.API.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
 
+        [Authorize]
         [HttpDelete("DeleteUserAddress/{addressId}")]
         public async Task<IActionResult> DeleteUserAddress(int? addressId)
             {
@@ -148,6 +155,7 @@ namespace e_Commerce.API.Controllers
     
             }
 
+        [Authorize]
         [HttpPut("SetDefaultAddress/{addressId}")]
         public async Task<IActionResult> SetDefaultAddress(int? addressId)
         {
@@ -166,6 +174,7 @@ namespace e_Commerce.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("GetUserAllWishlistProducts/{userId}")]
         public async Task<IActionResult> GetUserAllWishlistProducts(int? userId)
         {
@@ -180,6 +189,7 @@ namespace e_Commerce.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("AddToWishlist/{userId}")]
         public async Task<IActionResult> AddToWishlist([FromBody] AddUserWishlistDTO wishListItem, int? userId)
         {
@@ -201,6 +211,7 @@ namespace e_Commerce.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("RemoveWishlistItem/{wishlistId}")]
         public async Task<IActionResult> RemoveWishlistItem(int? wishlistId)
         {

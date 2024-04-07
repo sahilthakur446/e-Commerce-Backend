@@ -44,6 +44,33 @@ namespace eCommerce.Data.Repository.Implementation
             }
         }
 
+        public async Task<ProductInfoDTOWithPagination> GetAllProductsUsingPaginationAsync(int currentPage, int pageSize)
+        {
+            try
+            {
+                var products = await _dbContext.Products
+                    .Include(product => product.Brand)
+                    .Include(product => product.Category)
+                    .Skip((currentPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+                var productDtos = mapper.Map<List<ProductInfoDTO>>(products);
+                var allProducts = await GetAllProductsAsync();
+                decimal productsCount = allProducts.Count();
+                int totalPages = (int) Math.Ceiling(productsCount / pageSize);
+                var productsWithTotalPage = new ProductInfoDTOWithPagination
+                {
+                    ProductList = productDtos,
+                    TotalPages = totalPages
+                };
+                return productsWithTotalPage;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Some Error Occured");
+            }
+        }
+
         public async Task<ProductInfoDTO> GetProduct(int id)
         {
             var product = await _dbContext.Products.Include(p => p.Brand).Include(p => p.Category).FirstOrDefaultAsync(p => p.ProductId == id);
@@ -152,6 +179,63 @@ namespace eCommerce.Data.Repository.Implementation
             var productDTOsList = mapper.Map<List<ProductInfoDTO>>(productList);
 
             return productDTOsList;
+        }
+
+        public async Task<ProductInfoDTOWithPagination> GetProductsWithFiltersWithPaginationAsync(int currentPage, int pageSize, int? minPrice, int? maxPrice, string? category, int? categoryId, int? brandId, string? gender, bool isNew)
+        {
+            var query = _dbContext.Products.AsQueryable();
+
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice);
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId);
+            }
+
+            if (brandId.HasValue)
+            {
+                query = query.Where(p => p.BrandId == brandId);
+            }
+
+            if (!string.IsNullOrEmpty(gender))
+            {
+                query = query.Where(p => p.TargetGender == GenderConverter.GetTargetGender(gender));
+            }
+
+            if (isNew)
+            {
+                query = query.OrderByDescending(p => p.DateAdded);
+            }
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                query = query.Where(p => p.Category.CategoryName.ToLower() == category.ToLower());
+            }
+
+            var productList = await query
+                .Include(p => p.Brand)
+                .Include(p => p.Category)
+                .Skip((currentPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            var productDtos = mapper.Map<List<ProductInfoDTO>>(productList);
+            var allProducts = await GetAllProductsAsync();
+            decimal productsCount = allProducts.Count();
+            int totalPages = (int)Math.Ceiling(productsCount / pageSize);
+            var productsWithTotalPage = new ProductInfoDTOWithPagination
+            {
+                ProductList = productDtos,
+                TotalPages = totalPages
+            };
+            return productsWithTotalPage;
         }
 
         private async Task<string> SaveImageAsync(int? categoryId, IFormFile imageFile)

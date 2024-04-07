@@ -58,4 +58,10 @@ namespace eCommerce.Data.DTOs
         public string CategoryName { get; set; }
         public string BrandName { get; set; }
         }
+
+    public class ProductInfoDTOWithPagination
+    {
+        public List<ProductInfoDTO> ProductList { get; set; }
+        public int TotalPages { get; set; }
     }
+}

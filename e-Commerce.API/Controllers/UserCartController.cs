@@ -1,5 +1,6 @@
 ﻿using eCommerce.Data.DTOs;
 using eCommerce.Data.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace e_Commerce.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserCartController : ControllerBase
     {
         private readonly IUserCartRepository userCartRepository;

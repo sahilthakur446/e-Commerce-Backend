@@ -30,7 +30,7 @@ namespace e_Commerce.API.Controllers
             }
             return NotFound();
         }
-        [Authorize(Roles ="Admin")]
+        [Authorize]
         [HttpGet]
         [Route("GetCategoriesWithProductCounts")]
         public async Task<IActionResult> GetCategoriesWithProductCounts() 
@@ -68,6 +68,7 @@ namespace e_Commerce.API.Controllers
             return NotFound();
             }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddCategory")]
         public async Task<IActionResult> AddCategory([FromBody] AddCategoryDTO categoryDTO)
@@ -84,6 +85,7 @@ namespace e_Commerce.API.Controllers
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("UpdateCategory/{id}")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryDTO categoryDTO)
@@ -110,6 +112,7 @@ namespace e_Commerce.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("DeleteCategory/{categoryId}")]
         public async Task<IActionResult> DeleteCategory(int? categoryId)

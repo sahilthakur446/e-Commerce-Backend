@@ -2,6 +2,7 @@
 using eCommerce.Data.DTOs;
 using eCommerce.Data.Models;
 using eCommerce.Data.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -37,14 +38,20 @@ namespace e_Commerce.API.Controllers
 
 
         [HttpGet("GetAllProducts")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAllProducts()
         {
             var products = await productRepository.GetAllProductsAsync();
             return Ok(products);
         }
 
-        [HttpGet("GetProductsAbovePrice/{minPrice}")]
+        [HttpGet("GetProductsWithPagination")]
+        public async Task<IActionResult> GetProductsWithPagination(int currentPage, int pageSize)
+        {
+            var products = await productRepository.GetAllProductsUsingPaginationAsync(currentPage, pageSize);
+            return Ok(products);
+        }
 
+        [HttpGet("GetProductsAbovePrice/{minPrice}")]
         public async Task<IActionResult> GetProductsAbovePriceRange(int? minPrice)
         {
             var products = await productRepository.GetProductsAbovePriceAsync(minPrice);
@@ -54,8 +61,8 @@ namespace e_Commerce.API.Controllers
             }
             return NotFound();
         }
-        [HttpGet("GetProductsBelowPrice/{maxPrice}")]
 
+        [HttpGet("GetProductsBelowPrice/{maxPrice}")]
         public async Task<IActionResult> GetProductsBelowPriceRange(int? maxPrice)
         {
             try
@@ -71,7 +78,6 @@ namespace e_Commerce.API.Controllers
         }
 
         [HttpGet("GetProductsWithinPriceRange/{minPrice}/{maxPrice}")]
-
         public async Task<IActionResult> GetProductsWithinPriceRange(int? minPrice, int? maxPrice)
         {
             try
@@ -89,8 +95,8 @@ namespace e_Commerce.API.Controllers
             }
         }
 
-        [HttpGet("GetProductwithGivenFilter")]
-        public async Task<IActionResult> GetProductwithGivenFilter(int? minPrice, int? maxPrice, string? category, int? categoryId, int? brandId, string? gender, bool isNew)
+        [HttpGet("GetFilteredProducts ")]
+        public async Task<IActionResult> GetFilteredProducts(int? minPrice, int? maxPrice, string? category, int? categoryId, int? brandId, string? gender, bool isNew)
         {
             try
             {
@@ -101,8 +107,20 @@ namespace e_Commerce.API.Controllers
             { return BadRequest(ex.Message); }
         }
 
-        [HttpPost]
-        [Route("AddProduct")]
+        [HttpGet("GetFilteredProductsWithPagination")]
+        public async Task<IActionResult> GetFilteredProductsWithPagination(int currentPage, int pageSize, int? minPrice, int? maxPrice, string? category, int? categoryId, int? brandId, string? gender, bool isNew)
+        {
+            try
+            {
+                var products = await productRepository.GetProductsWithFiltersWithPaginationAsync(currentPage, pageSize, minPrice, maxPrice, category, categoryId, brandId, gender, isNew);
+                return Ok(products);
+            }
+            catch (Exception ex)
+            { return BadRequest(ex.Message); }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("AddProduct")]
         public async Task<IActionResult> AddProduct([FromForm] AddProductDTO product)
         {
             if (product == null)
@@ -115,8 +133,8 @@ namespace e_Commerce.API.Controllers
             }) : StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
-        [HttpDelete]
-        [Route("DeleteProduct/{id}")]
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("DeleteProduct/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             bool result = await productRepository.DeleteProductAsync(id);
@@ -127,8 +145,8 @@ namespace e_Commerce.API.Controllers
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
-        [HttpPut]
-        [Route("UpdateProduct/{id}")]
+        [Authorize(Roles = "Admin")]
+        [HttpPut("UpdateProduct/{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromForm] UpdateProductDTO product)
         {
             bool result = await productRepository.UpdateProductAsync(id, product);

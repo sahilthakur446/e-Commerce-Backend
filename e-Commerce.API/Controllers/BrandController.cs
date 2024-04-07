@@ -2,6 +2,7 @@
 using eCommerce.Data.Models;
 using eCommerce.Data.Repository.Implementation;
 using eCommerce.Data.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -79,6 +80,7 @@ namespace e_Commerce.API.Controllers
             return NotFound();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddBrand")]
         public async Task<IActionResult> AddBrand([FromBody] CreateUpdateBrandDto brandDTO)
@@ -95,6 +97,7 @@ namespace e_Commerce.API.Controllers
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("UpdateBrand/{brandId}")]
         public async Task<IActionResult> UpdateBrand(int brandId, [FromBody] CreateUpdateBrandDto brandDTO)
@@ -111,6 +114,7 @@ namespace e_Commerce.API.Controllers
             return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("DeleteBrand/{brandId}")]
         public async Task<IActionResult> DeleteBrand(int? brandId)

@@ -1,6 +1,7 @@
 ﻿using eCommerce.Data.DTOs;
 using eCommerce.Data.Models;
 using eCommerce.Data.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -18,6 +19,7 @@ namespace e_Commerce.API.Controllers
             this.userOrderRepo = userOrderRepo;
             }
 
+        [Authorize]
         [HttpGet("GetUserOrders/{userId}")]
         public async Task<IActionResult> Get(int? userId)
             {
@@ -25,6 +27,7 @@ namespace e_Commerce.API.Controllers
             return Ok(userOrders);
             }
 
+        [Authorize]
         [HttpGet("GetUserOrderListWihtPaymentStatusAsync")]
         public async Task<IActionResult> GetUserOrderListWihtPaymentStatusAsync()
             {
@@ -32,7 +35,7 @@ namespace e_Commerce.API.Controllers
             return Ok(userOrdersList);
             }
 
-
+        [Authorize]
         [HttpPost("AddUserOrder/{userId}")]
         public async Task<IActionResult> AddUserOrder(int userId, [FromBody] AddUserOrderDTO userOrderDetails)
             {
@@ -51,6 +54,7 @@ namespace e_Commerce.API.Controllers
                 }
             }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("ChangeOrderStatus/{orderId}")]
         public async Task<IActionResult> ChangeOrderStatus(int orderId, string orderStatus)
             {
