@@ -17,7 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>
     (options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DBCS")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LDBCS")));
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -53,11 +53,11 @@ var app = builder.Build();
 // Enable CORS for all origins, headers, and methods. This is a simple setup; adjust it based on your specific requirements.
 app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseAuthentication();
